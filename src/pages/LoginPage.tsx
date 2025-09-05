@@ -1,4 +1,8 @@
 import { Link } from "react-router";
+import { Form, Formik } from "formik";
+import * as Yup from "yup";
+import { TextInput } from "../components";
+
 import "../styles/login.css";
 // import logo from "../assets/panaderia.png";
 
@@ -20,29 +24,44 @@ export const LoginPage = () => {
               <h2>Iniciar sesión</h2>
             </div>
             <div className="row">
-              <form className="form-group">
-                <div className="row">
-                  <input
-                    type="text"
-                    name="username"
-                    id="username"
-                    className="form__input"
-                    placeholder="Usuario"
-                  />
-                </div>
-                <div className="row">
-                  <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    className="form__input"
-                    placeholder="Contraseña"
-                  />
-                </div>
-                <div className="row row-btn">
-                  <input type="submit" value="Ingresar" className="btn" />
-                </div>
-              </form>
+              <Formik
+                initialValues={{
+                  username: "",
+                  password: "",
+                }}
+                onSubmit={(values) => {
+                  console.log(values);
+                }}
+                validationSchema={Yup.object({
+                  username: Yup.string().required("Ingresa el usuario"),
+
+                  password: Yup.string()
+                    .min(6, "Debe ser minimo 6 caracteres")
+                    .required("Ingresa la contraseña"),
+                })}
+              >
+                {({}) => (
+                  <Form className="form-group">
+                    <TextInput
+                      label="Usuario"
+                      name="username"
+                      type="text"
+                      placeholder="Usuario"
+                      className="form__input"
+                    />
+                    <TextInput
+                      label="Contraseña"
+                      name="password"
+                      type="password"
+                      placeholder="Contraseña"
+                      className="form__input"
+                    />
+                    <div className="row row-btn">
+                      <input type="submit" value="Ingresar" className="btn" />
+                    </div>
+                  </Form>
+                )}
+              </Formik>
             </div>
             <div className="row row-link">
               <Link to="/forgot">¿Olvidaste tu contraseña?</Link>

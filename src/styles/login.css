@@ -61,7 +61,10 @@ form{
 	border-radius: 4px;
 }
 .btn{
+	flex: 1 1 auto;
 	transition: all .5s ease;
+	max-width: 200px;
+	/* padding: 0.75em 1em; */
 	width: 70%;
 	border-radius: 30px;
 	color:#008080;
@@ -70,6 +73,8 @@ form{
 	border: 1px solid #008080;
 	margin-top: 1.5em;
 	margin-bottom: 1em;
+	text-align: center;
+	white-space: normal;
 }
 .btn:hover, .btn:focus{
 	background-color: #008080;
@@ -80,6 +85,7 @@ form{
 .row-btn {
   display: flex;
   justify-content: center;
+  padding: 0 1em;
 }
 
 .row-link {
@@ -96,4 +102,11 @@ form{
 
 .row-link a:hover {
   text-decoration: underline;
+}
+
+.error-text{
+	color: red;
+	font-size: 0.9rem;
+	margin-top: 0.25rem;
+	display: block;
 }

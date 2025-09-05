@@ -1,4 +1,7 @@
 import { Link } from "react-router";
+import { Form, Formik } from "formik";
+import * as Yup from "yup";
+import { TextInput } from "../components";
 
 export const ForgotPage = () => {
   return (
@@ -18,42 +21,63 @@ export const ForgotPage = () => {
               <h2>Recuperar contraseña</h2>
             </div>
             <div className="row">
-              <form className="form-group">
-                <div className="row">
-                  <input
-                    type="text"
-                    name="username"
-                    id="username"
-                    className="form__input"
-                    placeholder="Usuario"
-                  />
-                </div>
-                <div className="row">
-                  <input
-                    type="password"
-                    name="password"
-                    id="password1"
-                    className="form__input"
-                    placeholder="Contraseña"
-                  />
-                </div>
-                <div className="row">
-                  <input
-                    type="password"
-                    name="password"
-                    id="password2"
-                    className="form__input"
-                    placeholder="Confirmar contraseña"
-                  />
-                </div>
-                <div className="row row-btn">
-                  <input
-                    type="submit"
-                    value="Cambiar contraseña"
-                    className="btn"
-                  />
-                </div>
-              </form>
+              <Formik
+                initialValues={{
+                  username: "",
+                  password1: "",
+                  password2: "",
+                }}
+                onSubmit={(values) => {
+                  console.log(values);
+                }}
+                validationSchema={Yup.object({
+                  username: Yup.string().required("Ingresa el usuario"),
+
+                  password1: Yup.string()
+                    .min(6, "Debe ser minimo 6 caracteres")
+                    .required("Ingresa la contraseña"),
+
+                  password2: Yup.string()
+                    .oneOf(
+                      [Yup.ref("password1")],
+                      "Las contraseñas no coinciden"
+                    )
+                    .required("Ingresa la contraseña"),
+                })}
+              >
+                {({}) => (
+                  <Form className="form-group">
+                    <TextInput
+                      label="username"
+                      name="username"
+                      type="text"
+                      className="form__input"
+                      placeholder="Usuario"
+                    />
+                    <TextInput
+                      label="password1"
+                      name="password1"
+                      type="password"
+                      className="form__input"
+                      placeholder="Contraseña"
+                    />
+                    <TextInput
+                      label="password2"
+                      name="password2"
+                      type="password"
+                      className="form__input"
+                      placeholder="Confirmar contraseña"
+                    />
+                    <div className="row row-btn">
+                      <input
+                        type="submit"
+                        value="Cambiar contraseña"
+                        className="btn"
+                      />
+                    </div>
+                  </Form>
+                )}
+              </Formik>
             </div>
             <div className="row row-link">
               <Link to="/login">Iniciar sesión</Link>
