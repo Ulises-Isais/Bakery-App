@@ -1,12 +1,32 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
+import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { TextInput } from "../components";
 
 import "../styles/login.css";
+import {
+  loginFailure,
+  loginStart,
+  loginSuccess,
+} from "../store/auth/authSlice";
+import { useEffect } from "react";
 // import logo from "../assets/panaderia.png";
 
 export const LoginPage = () => {
+  const dispatch = useAppDispatch();
+  const { loading, error, isAuthenticated } = useAppSelector(
+    (state) => state.auth
+  );
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
   return (
     <div className="container-fluid">
       <div className="row main-content bg-success text-center">
@@ -29,7 +49,24 @@ export const LoginPage = () => {
                   username: "",
                   password: "",
                 }}
-                onSubmit={(values) => {
+                onSubmit={async (values) => {
+                  try {
+                    dispatch(loginStart());
+
+                    //Simulación de llamada de API
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                    //Simulación de respuesta de API
+                    const fakeUser = { id: 1, username: values.username };
+                    const fakeToken = "abc123";
+
+                    dispatch(
+                      loginSuccess({ user: fakeUser, token: fakeToken })
+                    );
+                  } catch (error) {
+                    dispatch(loginFailure("Credenciales invalidas"));
+                  }
+
                   console.log(values);
                 }}
                 validationSchema={Yup.object({
@@ -57,8 +94,16 @@ export const LoginPage = () => {
                       className="form__input"
                     />
                     <div className="row row-btn">
-                      <input type="submit" value="Ingresar" className="btn" />
+                      <button type="submit" disabled={loading} className="btn">
+                        {loading ? "Cargando..." : "Ingresar"}
+                      </button>
+                      {/* <input type="submit" value="Ingresar" className="btn" /> */}
                     </div>
+                    {error && (
+                      <div className="row">
+                        <p className="text-red-500"> {error}</p>
+                      </div>
+                    )}
                   </Form>
                 )}
               </Formik>

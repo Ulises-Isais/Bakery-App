@@ -2,8 +2,17 @@ import { Link } from "react-router";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import { TextInput } from "../components";
+import { useAppDispatch, useAppSelector } from "../hooks/hooks";
+import {
+  changePasswordFailure,
+  changePasswordStart,
+  changePasswordSuccess,
+} from "../store/auth/forgotSlice";
 
 export const ForgotPage = () => {
+  const dispatch = useAppDispatch();
+  const { loading, success, error } = useAppSelector((state) => state.forgot);
+
   return (
     <div className="container-fluid">
       <div className="row main-content bg-success text-center">
@@ -27,7 +36,21 @@ export const ForgotPage = () => {
                   password1: "",
                   password2: "",
                 }}
-                onSubmit={(values) => {
+                onSubmit={async (values) => {
+                  dispatch(changePasswordStart());
+
+                  try {
+                    //Simulacion de API Call
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                    //Simula exito
+                    dispatch(changePasswordSuccess());
+                  } catch (error) {
+                    dispatch(
+                      changePasswordFailure("Error al cambiar la contraseña")
+                    );
+                  }
+
                   console.log(values);
                 }}
                 validationSchema={Yup.object({
@@ -69,12 +92,16 @@ export const ForgotPage = () => {
                       placeholder="Confirmar contraseña"
                     />
                     <div className="row row-btn">
-                      <input
-                        type="submit"
-                        value="Cambiar contraseña"
-                        className="btn"
-                      />
+                      <button type="submit" disabled={loading} className="btn">
+                        {loading ? "Cambiando..." : "Cambiar contraseña"}
+                      </button>
                     </div>
+                    {success && (
+                      <p className="text-success">
+                        Contraseña cambiada correctamente
+                      </p>
+                    )}
+                    {error && <p className="text-danger"> {error}</p>}
                   </Form>
                 )}
               </Formik>

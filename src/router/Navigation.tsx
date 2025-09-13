@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { LoginPage, ForgotPage, DashboardPage } from "../pages";
+import { PrivateRoute } from "../components";
 
 export const Navigation = () => {
   return (
@@ -61,7 +62,14 @@ export const Navigation = () => {
         <Routes>
           <Route path="login" element={<LoginPage />} />
           <Route path="forgot" element={<ForgotPage />} />
-          <Route path="dashboard" element={<DashboardPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <DashboardPage />
+              </PrivateRoute>
+            }
+          />
           <Route path="/*" element={<Navigate to="/login" replace />} />
         </Routes>
       </div>

@@ -1,9 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 import { AppPan } from "./AppPan";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AppPan />
+    <Provider store={store}>
+      <AppPan />
+    </Provider>
   </StrictMode>
 );
