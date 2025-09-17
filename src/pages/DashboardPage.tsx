@@ -1,4 +1,7 @@
-// src/pages/DashboardPage.tsx
+import { Grid, Typography } from "@mui/material";
+import { Sidebar } from "../components/Sidebar";
+import { Cards } from "../components/Cards";
+import { DataTable } from "../components";
 
 // Tipos
 interface Repartidor {
@@ -84,164 +87,102 @@ const despachoTarde: Despacho[] = [
 
 export const DashboardPage = () => {
   return (
-    <div className="container-fluid">
-      <div className="row">
-        {/* Sidebar */}
-        <nav className="col-md-2 d-none d-md-block bg-light sidebar pt-3">
-          <ul className="nav flex-column">
-            <li className="nav-item">
-              <a className="nav-link active" href="#">
-                Dashboard
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">
-                Repartidores
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">
-                Despacho Mañana
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">
-                Despacho Tarde
-              </a>
-            </li>
-          </ul>
-        </nav>
+    <Sidebar>
+      {/* Contenedor principal para ocupar toda la pantalla */}
 
-        {/* Contenido principal */}
-        <main className="col-md-9 ml-sm-auto col-lg-10 px-4">
-          <h1 className="mt-4 mb-4">Dashboard</h1>
+      {/* Titulo principal */}
+      <Typography variant="h4" gutterBottom>
+        Dashboard
+      </Typography>
 
-          {/* Cards con métricas */}
-          <div className="row mb-4">
-            <div className="col-md-4">
-              <div className="card text-white bg-primary mb-3">
-                <div className="card-body">
-                  <h5 className="card-title">Total Pan Vendido</h5>
-                  <p className="card-text">
-                    {repartidores.reduce((acc, r) => acc + r.panVendido, 0)}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="card text-white bg-success mb-3">
-                <div className="card-body">
-                  <h5 className="card-title">Ventas Mañana</h5>
-                  <p className="card-text">
-                    {despachoManana.reduce((acc, d) => acc + d.total, 0)}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="card text-white bg-warning mb-3">
-                <div className="card-body">
-                  <h5 className="card-title">Ventas Tarde</h5>
-                  <p className="card-text">
-                    {despachoTarde.reduce((acc, d) => acc + d.total, 0)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Cards con métricas principales */}
+      <Grid container spacing={3} mb={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Cards
+            title="Total Pan Vendido"
+            value={repartidores.reduce((acc, r) => acc + r.panVendido, 0)}
+            color="primary"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Cards
+            title="Ventas Mañana"
+            value={despachoManana.reduce((acc, d) => acc + d.total, 0)}
+            color="success"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Cards
+            title="Ventas Tarde"
+            value={despachoTarde.reduce((acc, d) => acc + d.total, 0)}
+            color="warning"
+          />
+        </Grid>
+      </Grid>
 
-          {/* Tabla Repartidores */}
-          <h2>Repartidores</h2>
-          <div className="table-responsive mb-4">
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Pan Vendido</th>
-                  <th>Extra</th>
-                  <th>Regreso</th>
-                  <th>Cambios</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {repartidores.map((r) => (
-                  <tr key={r.nombre}>
-                    <td>{r.nombre}</td>
-                    <td>{r.panVendido}</td>
-                    <td>{r.extra}</td>
-                    <td>{r.regreso}</td>
-                    <td>{r.cambios}</td>
-                    <td>{r.total}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      {/* Tablas con datos */}
+      <DataTable
+        title="Repartidores"
+        headers={[
+          "Nombre",
+          "Pan Vendido",
+          "Extra",
+          "Regreso",
+          "Cambios",
+          "Total",
+        ]}
+        rows={repartidores.map((r) => [
+          r.nombre,
+          r.panVendido,
+          r.extra,
+          r.regreso,
+          r.cambios,
+          r.total,
+        ])}
+      />
+      <DataTable
+        title="Despacho Mañana"
+        headers={[
+          "Categoria",
+          "Hay",
+          "Ingresa",
+          "Queda",
+          "Precio",
+          "Consumo",
+          "Total",
+        ]}
+        rows={despachoManana.map((d) => [
+          d.categoria,
+          d.hay,
+          d.ingresa,
+          d.queda,
+          d.precio,
+          d.consumo,
+          d.total,
+        ])}
+      />
 
-          {/* Tabla Despacho Mañana */}
-          <h2>Despacho Mañana</h2>
-          <div className="table-responsive mb-4">
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>Categoria</th>
-                  <th>Hay</th>
-                  <th>Ingresa</th>
-                  <th>Queda</th>
-                  <th>Precio</th>
-                  <th>Consumo</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {despachoManana.map((d, idx) => (
-                  <tr key={idx}>
-                    <td>{d.categoria}</td>
-                    <td>{d.hay}</td>
-                    <td>{d.ingresa}</td>
-                    <td>{d.queda}</td>
-                    <td>{d.precio}</td>
-                    <td>{d.consumo}</td>
-                    <td>{d.total}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Tabla Despacho Tarde */}
-          <h2>Despacho Tarde</h2>
-          <div className="table-responsive mb-4">
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th>Categoria</th>
-                  <th>Hay</th>
-                  <th>Ingresa</th>
-                  <th>Queda</th>
-                  <th>Precio</th>
-                  <th>Consumo</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {despachoTarde.map((d, idx) => (
-                  <tr key={idx}>
-                    <td>{d.categoria}</td>
-                    <td>{d.hay}</td>
-                    <td>{d.ingresa}</td>
-                    <td>{d.queda}</td>
-                    <td>{d.precio}</td>
-                    <td>{d.consumo}</td>
-                    <td>{d.total}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </main>
-      </div>
-    </div>
+      <DataTable
+        title="Despacho Tarde"
+        headers={[
+          "Categoria",
+          "Hay",
+          "Ingresa",
+          "Queda",
+          "Precio",
+          "Consumo",
+          "Total",
+        ]}
+        rows={despachoTarde.map((d) => [
+          d.categoria,
+          d.hay,
+          d.ingresa,
+          d.queda,
+          d.precio,
+          d.consumo,
+          d.total,
+        ])}
+      />
+    </Sidebar>
   );
 };
