@@ -1,5 +1,6 @@
-// src/components/Sidebar.tsx
 import { useState } from "react";
+import { useNavigate } from "react-router";
+
 import {
   Box,
   Drawer,
@@ -18,9 +19,10 @@ import {
 import {
   Menu as MenuIcon,
   Home as HomeIcon,
-  BarChart as BarChartIcon,
-  TableChart as TableChartIcon,
+  ShowChart as ShowChartIcon,
   Logout as LogoutIcon,
+  Inventory as InventoryIcon,
+  MonetizationOn as MonetizationOnIcon,
 } from "@mui/icons-material";
 
 const drawerWidth = 240;
@@ -35,18 +37,21 @@ export const Sidebar = ({ children }: { children?: React.ReactNode }) => {
     setOpen(!open);
   };
 
+  const navigate = useNavigate();
+
   const drawer = (
     <div>
       <Toolbar />
       <List>
         {[
-          { text: "Inicio", icon: <HomeIcon /> },
-          { text: "Gráficas", icon: <BarChartIcon /> },
-          { text: "Tablas", icon: <TableChartIcon /> },
-          { text: "Salir", icon: <LogoutIcon /> },
+          { text: "Inicio", icon: <HomeIcon />, path: "/dashboard" },
+          { text: "Ventas", icon: <MonetizationOnIcon />, path: "/sales" },
+          { text: "Inventario", icon: <InventoryIcon />, path: "/inventory" },
+          { text: "Gráficas", icon: <ShowChartIcon />, path: "/graphics" },
+          { text: "Salir", icon: <LogoutIcon />, path: "/login" },
         ].map((item) => (
           <ListItem key={item.text} disablePadding>
-            <ListItemButton>
+            <ListItemButton onClick={() => navigate(item.path)}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>

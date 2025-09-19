@@ -92,7 +92,7 @@ export const DashboardPage = () => {
 
       {/* Titulo principal */}
       <Typography variant="h4" gutterBottom>
-        Dashboard
+        Inicio
       </Typography>
 
       {/* Cards con métricas principales */}
