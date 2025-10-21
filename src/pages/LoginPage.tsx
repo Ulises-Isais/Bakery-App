@@ -3,15 +3,23 @@ import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { TextInput } from "../components";
+import appApi from "../api/api";
 
 import "../styles/login.css";
 import {
+  clearError,
   loginFailure,
   loginStart,
   loginSuccess,
 } from "../store/auth/authSlice";
 import { useEffect } from "react";
+import { Alert } from "@mui/material";
 // import logo from "../assets/panaderia.png";
+
+interface LoginFormValues {
+  username: string;
+  password: string;
+}
 
 export const LoginPage = () => {
   const dispatch = useAppDispatch();
@@ -26,6 +34,11 @@ export const LoginPage = () => {
       navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
+
+  const initialValues: LoginFormValues = {
+    username: "",
+    password: "",
+  };
 
   return (
     <div className="container-fluid">
@@ -45,29 +58,30 @@ export const LoginPage = () => {
             </div>
             <div className="row">
               <Formik
-                initialValues={{
-                  username: "",
-                  password: "",
-                }}
+                initialValues={initialValues}
                 onSubmit={async (values) => {
                   try {
                     dispatch(loginStart());
 
-                    //Simulación de llamada de API
-                    await new Promise((resolve) => setTimeout(resolve, 1000));
+                    // Petición al backend
+                    const { data } = await appApi.post("/auth/login", {
+                      username: values.username,
+                      password: values.password,
+                    });
 
-                    //Simulación de respuesta de API
-                    const fakeUser = { id: 1, username: values.username };
-                    const fakeToken = "abc123";
+                    localStorage.setItem("token", data.token);
 
                     dispatch(
-                      loginSuccess({ user: fakeUser, token: fakeToken })
+                      loginSuccess({ user: data.user, token: data.token })
                     );
-                  } catch (error) {
-                    dispatch(loginFailure("Credenciales invalidas"));
+                  } catch (error: any) {
+                    dispatch(
+                      loginFailure(
+                        error.response?.data?.msg ||
+                          "Credenciales invalidas o error en el servidor"
+                      )
+                    );
                   }
-
-                  console.log(values);
                 }}
                 validationSchema={Yup.object({
                   username: Yup.string().required("Ingresa el usuario"),
@@ -99,9 +113,16 @@ export const LoginPage = () => {
                       </button>
                       {/* <input type="submit" value="Ingresar" className="btn" /> */}
                     </div>
+
                     {error && (
-                      <div className="row">
-                        <p className="text-red-500"> {error}</p>
+                      <div className="row mt-2">
+                        <Alert
+                          sx={{ mb: 2 }}
+                          severity="error"
+                          onClose={() => dispatch(clearError())}
+                        >
+                          {error}
+                        </Alert>
                       </div>
                     )}
                   </Form>
