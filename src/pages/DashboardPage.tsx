@@ -2,145 +2,100 @@ import { Grid, Typography } from "@mui/material";
 import { Sidebar } from "../components/Sidebar";
 import { Cards } from "../components/Cards";
 import { DataTable } from "../components";
-
-// Tipos
-interface Repartidor {
-  nombre: string;
-  panVendido: number;
-  extra: number;
-  regreso: number;
-  cambios: number;
-  total: number;
-}
-
-interface Despacho {
-  categoria: string;
-  hay: number;
-  ingresa: number;
-  queda: number;
-  precio: number;
-  consumo: number;
-  total: number;
-}
-
-// Datos de ejemplo
-const repartidores: Repartidor[] = [
-  {
-    nombre: "Beto",
-    panVendido: 50,
-    extra: 5,
-    regreso: 2,
-    cambios: 1,
-    total: 58,
-  },
-  {
-    nombre: "Jonh",
-    panVendido: 30,
-    extra: 3,
-    regreso: 1,
-    cambios: 2,
-    total: 36,
-  },
-];
-
-const despachoManana: Despacho[] = [
-  {
-    categoria: "Pan blanco",
-    hay: 100,
-    ingresa: 20,
-    queda: 80,
-    precio: 10,
-    consumo: 40,
-    total: 400,
-  },
-  {
-    categoria: "Pan integral",
-    hay: 50,
-    ingresa: 10,
-    queda: 45,
-    precio: 12,
-    consumo: 15,
-    total: 180,
-  },
-];
-
-const despachoTarde: Despacho[] = [
-  {
-    categoria: "Pan dulce",
-    hay: 60,
-    ingresa: 15,
-    queda: 50,
-    precio: 15,
-    consumo: 25,
-    total: 375,
-  },
-  {
-    categoria: "Bollería",
-    hay: 40,
-    ingresa: 5,
-    queda: 35,
-    precio: 20,
-    consumo: 10,
-    total: 200,
-  },
-];
+import { useEffect } from "react";
+import { fetchSales } from "../store/sales/salesSlice";
+import { useAppDispatch, useAppSelector } from "../hooks/hooks";
+import { fetchSalesCards } from "../store/sales/salesSliceCards";
 
 export const DashboardPage = () => {
+  const dispatch = useAppDispatch();
+
+  // Estado del slice
+  const { repartidores, loading, error } = useAppSelector(
+    (state) => state.sales
+  );
+
+  const { corte, totalGeneral } = useAppSelector((state) => state.salesCards);
+
+  // Llamada al backend al montar el componente
+
+  useEffect(() => {
+    dispatch(fetchSales());
+    dispatch(fetchSalesCards({ fecha: "2025-09-12", turno: "mañana" }));
+  }, [dispatch]);
+
+  if (loading) return <Typography>Cargando...</Typography>;
+  if (error) return <Typography color="error">Error: {error}</Typography>;
+
   return (
     <Sidebar>
-      {/* Contenedor principal para ocupar toda la pantalla */}
-
-      {/* Titulo principal */}
       <Typography variant="h4" gutterBottom>
         Inicio
       </Typography>
 
-      {/* Cards con métricas principales */}
       <Grid container spacing={3} mb={4}>
         <Grid size={{ xs: 12, md: 4 }}>
           <Cards
-            title="Total Pan Vendido"
-            value={repartidores.reduce((acc, r) => acc + r.panVendido, 0)}
+            title="Total venta repartidores"
+            value={repartidores.reduce((acc, r) => acc + r.total, 0)}
             color="primary"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <Cards
             title="Ventas Mañana"
-            value={despachoManana.reduce((acc, d) => acc + d.total, 0)}
+            value={totalGeneral} //TODO Agregar ventas de despacho
             color="success"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <Cards
             title="Ventas Tarde"
-            value={despachoTarde.reduce((acc, d) => acc + d.total, 0)}
+            value={0} //TODO Agregar ventas de despacho
             color="warning"
           />
         </Grid>
       </Grid>
 
-      {/* Tablas con datos */}
       <DataTable
         title="Repartidores"
-        headers={[
-          "Nombre",
-          "Pan Vendido",
-          "Extra",
-          "Regreso",
-          "Cambios",
-          "Total",
-        ]}
+        headers={["Nombre", "Regreso", "Cambios", "Extra", "Notas", "Total"]}
         rows={repartidores.map((r) => [
           r.nombre,
-          r.panVendido,
-          r.extra,
           r.regreso,
           r.cambios,
+          r.extra,
+          r.notas,
           r.total,
         ])}
       />
       <DataTable
+        title="Despacho mañana"
+        headers={["Categoria", "Total Categoria"]}
+        rows={corte.map((c) => [c.id_categoria, c.total_por_categoria])}
+      />
+      {/* <DataTable
+        title="Despacho Mañana"
+        headers={[
+          "Categoria",
+          "Hay",
+          "Ingresa",
+          "Quedan",
+          "Precio",
+          "Vendido",
+          "Total",
+        ]}
+        rows={despachoManana.map((d) => [
+          d.categoria,
+          d.hay,
+          d.ingresa,
+          d.quedan,
+          d.precio,
+          d.consumo,
+          d.total,
+        ])}
+      /> */}
+      {/* <DataTable
         title="Despacho Mañana"
         headers={[
           "Categoria",
@@ -182,7 +137,7 @@ export const DashboardPage = () => {
           d.consumo,
           d.total,
         ])}
-      />
+      /> */}
     </Sidebar>
   );
 };
