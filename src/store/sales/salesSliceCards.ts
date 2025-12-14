@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import appApi from "../../api/api";
 
 interface Corte {
-  id_categoria: number;
+  categoria: number;
   total_por_categoria: number;
   total_general: number;
 }

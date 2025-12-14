@@ -8,7 +8,7 @@ import appApi from "../../api/api";
 //Tipos
 interface Repartidor {
   nombre: string;
-  notas: string;
+  notas: number;
   extra: number;
   regreso: number;
   cambios: number;

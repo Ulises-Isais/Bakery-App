@@ -1,9 +1,33 @@
+import { useEffect } from "react";
 import { Grid, Typography } from "@mui/material";
+
 import { Sidebar } from "../components";
 import { Cards } from "../components/Cards";
 import { DataTable } from "../components/DataTable";
 
+import { useAppDispatch, useAppSelector } from "../hooks/hooks";
+import { fetchDespacho } from "../store/sales/salesDespachoSlice";
+import { formatMoney } from "../helpers";
+
 export const SalesPage = () => {
+  const dispatch = useAppDispatch();
+
+  const { loading, error, despacho } = useAppSelector(
+    (state) => state.salesDespacho
+  );
+
+  useEffect(() => {
+    dispatch(fetchDespacho({ fecha: "2025-09-12", turno: "tarde" }));
+  }, [dispatch]);
+
+  if (loading) {
+    return <Typography>Cargando...</Typography>;
+  }
+
+  if (error) {
+    return <Typography color="error">Error: {error}</Typography>;
+  }
+
   return (
     <Sidebar>
       <Typography variant="h4" gutterBottom>
@@ -25,6 +49,27 @@ export const SalesPage = () => {
       </Grid>
       {/* //TODO: Graficas */}
       {/* Tablas */}
+
+      {/* <DataTable
+        title="Despacho Mañana"
+        headers={[
+          "Producto",
+          "Habían",
+          "Ingresan",
+          "Quedan",
+          "Vendido",
+          "Total",
+        ]}
+        rows={despacho.map((d) => [
+          d.producto,
+          d.cantidad_inicial,
+          d.ingreso,
+          d.quedan,
+          d.vendido,
+          d.total,
+        ])}
+      /> */}
+
       <DataTable
         title={"Despacho Mañana"}
         headers={[
@@ -42,13 +87,22 @@ export const SalesPage = () => {
         title={"Despacho Tarde"}
         headers={[
           "Categoria",
-          "Precio",
-          "Cantidad",
-          "Ingresan",
+          "Producto",
+          "Cantidad inicial",
+          "Ingreso",
           "Quedan",
+          "Vendido",
           "Total",
         ]}
-        rows={[]}
+        rows={despacho.map((d) => [
+          d.categoria,
+          d.producto,
+          d.cantidad_inicial,
+          d.ingreso,
+          d.quedan,
+          d.vendido,
+          formatMoney(d.total),
+        ])}
       />
 
       <DataTable

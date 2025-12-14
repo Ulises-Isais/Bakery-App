@@ -2,7 +2,7 @@ import { Card, CardContent, Typography } from "@mui/material";
 
 interface CardProps {
   title: string; // Texto del titulo
-  value: number; // Valor a mostrar
+  value: number | string; // Valor a mostrar
   color: "primary" | "success" | "warning"; //Colores de la paleta de MUI
 }
 
