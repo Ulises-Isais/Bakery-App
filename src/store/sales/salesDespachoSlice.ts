@@ -15,12 +15,9 @@ const initialState: SalesState = {
 
 export const fetchDespacho = createAsyncThunk(
   "salesDespacho/fetchDespacho",
-  async (
-    { fecha, turno }: { fecha: string; turno: string },
-    { rejectWithValue }
-  ) => {
+  async ({ fecha }: { fecha: string }, { rejectWithValue }) => {
     try {
-      const { data } = await appApi.post("/sales/despacho", { fecha, turno });
+      const { data } = await appApi.post("/sales/despacho", { fecha });
 
       if (!data.ok)
         throw new Error(data.msg || "Error en la respuesta del servidor");

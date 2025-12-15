@@ -19,7 +19,10 @@ export const DashboardPage = () => {
     error: errorSales,
   } = useAppSelector((state) => state.salesDriver);
 
-  const { corte, totalGeneral } = useAppSelector((state) => state.salesCards);
+  const { turnos, totalGeneral } = useAppSelector((state) => state.salesCards);
+
+  const manana = turnos["mañana"];
+  const tarde = turnos["tarde"];
 
   // Llamada al backend al montar el componente
 
@@ -48,20 +51,27 @@ export const DashboardPage = () => {
             value={formatMoney(
               repartidores.reduce((acc, r) => acc + r.total, 0)
             )}
-            color="primary"
+            color="#5A5E9C"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <Cards
             title="Ventas Mañana"
-            value={formatMoney(totalGeneral)} //TODO Agregar ventas de despacho
-            color="success"
+            value={formatMoney(manana?.total ?? 0)}
+            color="#333382"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <Cards
             title="Ventas Tarde"
-            value={0} //TODO Agregar ventas de despacho
+            value={formatMoney(tarde?.total ?? 0)}
+            color="#2b348c"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Cards
+            title="Total General"
+            value={formatMoney(totalGeneral)} //TODO Cambiar colores de las cards
             color="warning"
           />
         </Grid>
@@ -81,41 +91,22 @@ export const DashboardPage = () => {
       <DataTable
         title="Despacho mañana"
         headers={["Categoría", "Total Categoría"]}
-        rows={corte.map((c) => [
-          c.categoria,
-          formatMoney(c.total_por_categoria),
-        ])}
+        rows={
+          manana
+            ? manana.categorias.map((c) => [c.categoria, formatMoney(c.total)])
+            : []
+        }
       />
 
-      {/* <DataTable
+      <DataTable
         title="Despacho tarde"
         headers={["Categoría", "Total Categoría"]}
-        rows={corte.map((c) => {
-          c.categoria, formatMoney(c.total_por_categoria);
-        })}
-      /> */}
-      {/* // TODO: Hacer la tabla de la Tarde */}
-      {/* <DataTable
-        title="Despacho Tarde"
-        headers={[
-          "Categoria",
-          "Hay",
-          "Ingresa",
-          "Queda",
-          "Precio",
-          "Consumo",
-          "Total",
-        ]}
-        rows={despachoTarde.map((d) => [
-          d.categoria,
-          d.hay,
-          d.ingresa,
-          d.queda,
-          d.precio,
-          d.consumo,
-          d.total,
-        ])}
-      />  */}
+        rows={
+          tarde
+            ? tarde.categorias.map((c) => [c.categoria, formatMoney(c.total)])
+            : []
+        }
+      />
     </Sidebar>
   );
 };

@@ -1,21 +1,23 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import appApi from "../../api/api";
 
-interface Corte {
-  categoria: number;
-  total_por_categoria: number;
-  total_general: number;
+interface TurnoCorte {
+  total: number;
+  categorias: {
+    categoria: string;
+    total: number;
+  }[];
 }
 
-interface CardState {
-  corte: Corte[];
+interface SalesCardState {
+  turnos: Record<string, TurnoCorte>;
   totalGeneral: number;
   loading: boolean;
   error: string | null;
 }
 
-const initialState: CardState = {
-  corte: [],
+const initialState: SalesCardState = {
+  turnos: {},
   totalGeneral: 0,
   loading: false,
   error: null,
@@ -33,7 +35,7 @@ export const fetchSalesCards = createAsyncThunk(
       if (!data.ok) throw new Error(data.msg);
 
       return {
-        corte: data.corte,
+        turnos: data.turnos,
         totalGeneral: data.totalGeneral,
       };
     } catch (error: any) {
@@ -54,7 +56,7 @@ const salesCardSlice = createSlice({
       })
       .addCase(fetchSalesCards.fulfilled, (state, action) => {
         state.loading = false;
-        state.corte = action.payload.corte;
+        state.turnos = action.payload.turnos;
         state.totalGeneral = action.payload.totalGeneral;
       })
       .addCase(fetchSalesCards.rejected, (state, action) => {

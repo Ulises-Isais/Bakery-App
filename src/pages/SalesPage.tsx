@@ -12,12 +12,14 @@ import { formatMoney } from "../helpers";
 export const SalesPage = () => {
   const dispatch = useAppDispatch();
 
+  const { user } = useAppSelector((state) => state.auth);
+
   const { loading, error, despacho } = useAppSelector(
     (state) => state.salesDespacho
   );
 
   useEffect(() => {
-    dispatch(fetchDespacho({ fecha: "2025-09-12", turno: "tarde" }));
+    dispatch(fetchDespacho({ fecha: "2025-09-12" }));
   }, [dispatch]);
 
   if (loading) {
@@ -28,6 +30,10 @@ export const SalesPage = () => {
     return <Typography color="error">Error: {error}</Typography>;
   }
 
+  const despachoManana = despacho.filter((d) => d.turno === "mañana");
+  const despachoTarde = despacho.filter((d) => d.turno === "tarde");
+
+  const despachoPorTurno = despacho.filter((d) => d.turno === user?.turno);
   return (
     <Sidebar>
       <Typography variant="h4" gutterBottom>
@@ -49,61 +55,75 @@ export const SalesPage = () => {
       </Grid>
       {/* //TODO: Graficas */}
       {/* Tablas */}
-
-      {/* <DataTable
-        title="Despacho Mañana"
-        headers={[
-          "Producto",
-          "Habían",
-          "Ingresan",
-          "Quedan",
-          "Vendido",
-          "Total",
-        ]}
-        rows={despacho.map((d) => [
-          d.producto,
-          d.cantidad_inicial,
-          d.ingreso,
-          d.quedan,
-          d.vendido,
-          d.total,
-        ])}
-      /> */}
-
-      <DataTable
-        title={"Despacho Mañana"}
-        headers={[
-          "Categoria",
-          "Precio",
-          "Cantidad",
-          "Ingresan",
-          "Quedan",
-          "Total",
-        ]}
-        rows={[]}
-      />
-
-      <DataTable
-        title={"Despacho Tarde"}
-        headers={[
-          "Categoria",
-          "Producto",
-          "Cantidad inicial",
-          "Ingreso",
-          "Quedan",
-          "Vendido",
-          "Total",
-        ]}
-        rows={despacho.map((d) => [
-          d.categoria,
-          d.producto,
-          d.cantidad_inicial,
-          d.ingreso,
-          d.quedan,
-          d.vendido,
-          formatMoney(d.total),
-        ])}
-      />
+      {user?.role === "admin" && (
+        <>
+          <DataTable
+            title="Despacho Mañana"
+            headers={[
+              "Categoria",
+              "Producto",
+              "Cantidad inicial",
+              "Ingreso",
+              "Quedan",
+              "Vendido",
+              "Total",
+            ]}
+            rows={despachoManana.map((d) => [
+              d.categoria,
+              d.producto,
+              d.cantidad_inicial,
+              d.ingreso,
+              d.quedan,
+              d.vendido,
+              formatMoney(d.total),
+            ])}
+          />
+          <DataTable
+            title="Despacho Tarde"
+            headers={[
+              "Categoria",
+              "Producto",
+              "Cantidad inicial",
+              "Ingreso",
+              "Quedan",
+              "Vendido",
+              "Total",
+            ]}
+            rows={despachoTarde.map((d) => [
+              d.categoria,
+              d.producto,
+              d.cantidad_inicial,
+              d.ingreso,
+              d.quedan,
+              d.vendido,
+              formatMoney(d.total),
+            ])}
+          />
+        </>
+      )}
+      {user?.role === "despacho" && (
+        <DataTable
+          title={`Despacho ${user.turno}`}
+          headers={[
+            "Categoria",
+            "Producto",
+            "Cantidad inicial",
+            "Ingreso",
+            "Quedan",
+            "Vendido",
+            "Total",
+          ]}
+          rows={despacho.map((d) => [
+            d.categoria,
+            d.producto,
+            d.cantidad_inicial,
+            d.ingreso,
+            d.quedan,
+            d.vendido,
+            formatMoney(d.total),
+          ])}
+        />
+      )}
 
       <DataTable
         title={"Leche"}
