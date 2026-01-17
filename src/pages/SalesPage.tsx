@@ -8,6 +8,7 @@ import { DataTable } from "../components/DataTable";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { fetchDespacho } from "../store/sales/salesDespachoSlice";
 import { formatMoney } from "../helpers";
+import { fetchSalesCards } from "../store/sales/salesSliceCards";
 
 export const SalesPage = () => {
   const dispatch = useAppDispatch();
@@ -18,8 +19,11 @@ export const SalesPage = () => {
     (state) => state.salesDespacho
   );
 
+  const { totalesPorTurno } = useAppSelector((state) => state.salesCards);
+
   useEffect(() => {
     dispatch(fetchDespacho({ fecha: "2025-09-12" }));
+    dispatch(fetchSalesCards({ fecha: "2025-09-12" }));
   }, [dispatch]);
 
   if (loading) {
@@ -34,6 +38,38 @@ export const SalesPage = () => {
   const despachoTarde = despacho.filter((d) => d.turno === "tarde");
 
   const despachoPorTurno = despacho.filter((d) => d.turno === user?.turno);
+
+  const cardsToShow = [];
+  if (user?.role === "admin") {
+    cardsToShow.push(
+      {
+        title: "Venta mañana",
+        value: totalesPorTurno?.mañana ?? 0,
+        color: "#333382",
+      },
+      {
+        title: "Venta tarde",
+        value: totalesPorTurno?.tarde ?? 0,
+        color: "#333382",
+      },
+      {
+        title: "Repartidores",
+        value: 0,
+        color: "#333382",
+      }
+    );
+  }
+
+  if (user?.role === "despacho") {
+    cardsToShow.push({
+      title: user.turno === "mañana" ? "Venta mañana" : "Venta tarde",
+      value:
+        user.turno === "mañana"
+          ? totalesPorTurno?.mañana
+          : totalesPorTurno?.tarde,
+      color: "#333382",
+    });
+  }
   return (
     <Sidebar>
       <Typography variant="h4" gutterBottom>
@@ -41,24 +77,21 @@ export const SalesPage = () => {
       </Typography>
       {/* Cards con métricas */}
       <Grid container spacing={3} mb={4}>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Cards title={"Venta Mañana"} value={0} color={"primary"} />
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Cards title={"Ventas Tarde"} value={0} color={"primary"} />
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Cards title={"Repartidores"} value={0} color={"primary"} />
-        </Grid>
+        {cardsToShow.map((card, index) => (
+          <Grid key={index} size={{ xs: 12, md: 4 }}>
+            <Cards
+              title={card.title}
+              value={formatMoney(card.value)}
+              color={card.color}
+            />
+          </Grid>
+        ))}
       </Grid>
-      {/* //TODO: Graficas */}
       {/* Tablas */}
       {user?.role === "admin" && (
         <>
           <DataTable
-            title="Despacho Mañana"
+            title="Despacho mañana"
             headers={[
               "Categoria",
               "Producto",
@@ -79,7 +112,7 @@ export const SalesPage = () => {
             ])}
           />
           <DataTable
-            title="Despacho Tarde"
+            title="Despacho tarde"
             headers={[
               "Categoria",
               "Producto",
@@ -113,7 +146,7 @@ export const SalesPage = () => {
             "Vendido",
             "Total",
           ]}
-          rows={despacho.map((d) => [
+          rows={despachoPorTurno.map((d) => [
             d.categoria,
             d.producto,
             d.cantidad_inicial,

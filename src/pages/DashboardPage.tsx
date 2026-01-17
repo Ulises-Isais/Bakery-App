@@ -8,6 +8,7 @@ import { Cards } from "../components/Cards";
 import { DataTable } from "../components";
 import { fetchSales } from "../store/sales/salesSlice";
 import { fetchSalesCards } from "../store/sales/salesSliceCards";
+import { selectTotalGeneralConRepartidores } from "../store/sales/selectors";
 
 export const DashboardPage = () => {
   const dispatch = useAppDispatch();
@@ -19,7 +20,9 @@ export const DashboardPage = () => {
     error: errorSales,
   } = useAppSelector((state) => state.salesDriver);
 
-  const { turnos, totalGeneral } = useAppSelector((state) => state.salesCards);
+  const totalGeneralFinal = useAppSelector(selectTotalGeneralConRepartidores);
+
+  const { turnos } = useAppSelector((state) => state.salesCards);
 
   const manana = turnos["mañana"];
   const tarde = turnos["tarde"];
@@ -71,8 +74,8 @@ export const DashboardPage = () => {
         <Grid size={{ xs: 12, md: 4 }}>
           <Cards
             title="Total General"
-            value={formatMoney(totalGeneral)} //TODO Cambiar colores de las cards
-            color="warning"
+            value={formatMoney(totalGeneralFinal)} //TODO Cambiar colores de las cards
+            color="#333382"
           />
         </Grid>
       </Grid>
