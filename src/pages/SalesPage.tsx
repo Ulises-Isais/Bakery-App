@@ -9,6 +9,11 @@ import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { fetchDespacho } from "../store/sales/salesDespachoSlice";
 import { formatMoney } from "../helpers";
 import { fetchSalesCards } from "../store/sales/salesSliceCards";
+import {
+  selectRepartidoresTable,
+  selectTotalRepartidoresFromTable,
+} from "../store/sales/selectors";
+import { fetchSalesRepartidoresTable } from "../store/sales/salesRepartidoresTableSlice";
 
 export const SalesPage = () => {
   const dispatch = useAppDispatch();
@@ -16,17 +21,23 @@ export const SalesPage = () => {
   const { user } = useAppSelector((state) => state.auth);
 
   const { loading, error, despacho } = useAppSelector(
-    (state) => state.salesDespacho
+    (state) => state.salesDespacho,
   );
 
   const { totalesPorTurno } = useAppSelector((state) => state.salesCards);
 
+  const totalesRepartidores = useAppSelector(selectTotalRepartidoresFromTable);
+
+  const { rows: repartidoresRows, loading: loadingRepartidores } =
+    useAppSelector(selectRepartidoresTable);
+
   useEffect(() => {
     dispatch(fetchDespacho({ fecha: "2025-09-12" }));
     dispatch(fetchSalesCards({ fecha: "2025-09-12" }));
+    dispatch(fetchSalesRepartidoresTable({ fecha: "2025-09-12" }));
   }, [dispatch]);
 
-  if (loading) {
+  if (loading && loadingRepartidores) {
     return <Typography>Cargando...</Typography>;
   }
 
@@ -54,9 +65,9 @@ export const SalesPage = () => {
       },
       {
         title: "Repartidores",
-        value: 0,
+        value: totalesRepartidores,
         color: "#333382",
-      }
+      },
     );
   }
 
@@ -185,7 +196,18 @@ export const SalesPage = () => {
           "Total",
           "Debe",
         ]}
-        rows={[]}
+        rows={repartidoresRows.map((r) => [
+          r.nombre,
+          r.categoria,
+          r.cantidad,
+          r.extra,
+          r.regreso,
+          formatMoney(r.totalRegreso),
+          r.cambios,
+          formatMoney(r.totalCambios),
+          formatMoney(r.total),
+          formatMoney(r.debe),
+        ])}
       />
     </Sidebar>
   );

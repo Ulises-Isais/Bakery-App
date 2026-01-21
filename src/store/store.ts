@@ -4,6 +4,7 @@ import forgotSlice from "./auth/forgotSlice";
 import salesSlice from "./sales/salesSlice";
 import salesCardSlice from "./sales/salesSliceCards";
 import despachoSlice from "./sales/salesDespachoSlice";
+import salesRepartidoresTableSlice from "./sales/salesRepartidoresTableSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     salesDriver: salesSlice,
     salesCards: salesCardSlice,
     salesDespacho: despachoSlice,
+    salesRepartidoresTableSlice,
   },
 });
 
