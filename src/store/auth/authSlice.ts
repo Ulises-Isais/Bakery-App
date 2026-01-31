@@ -13,6 +13,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  initialized: boolean;
 }
 
 const initialState: AuthState = {
@@ -21,12 +22,24 @@ const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
   error: null,
+  initialized: false,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    initializeAuth(
+      state,
+      action: PayloadAction<{ user: User; token: string } | null>,
+    ) {
+      if (action.payload) {
+        ((state.user = action.payload.user),
+          (state.token = action.payload.token),
+          (state.isAuthenticated = true));
+      }
+      state.initialized = true;
+    },
     loginStart(state) {
       state.loading = true;
       state.error = null;
@@ -52,7 +65,13 @@ const authSlice = createSlice({
   },
 });
 
-export const { loginStart, loginSuccess, loginFailure, logout, clearError } =
-  authSlice.actions;
+export const {
+  initializeAuth,
+  loginStart,
+  loginSuccess,
+  loginFailure,
+  logout,
+  clearError,
+} = authSlice.actions;
 
 export default authSlice.reducer;

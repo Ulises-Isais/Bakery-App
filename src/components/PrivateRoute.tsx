@@ -3,7 +3,15 @@ import { useAppSelector } from "../hooks/hooks";
 import type { JSX } from "react";
 
 export const PrivateRoute = ({ children }: { children: JSX.Element }) => {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, initialized } = useAppSelector(
+    (state) => state.auth,
+  );
 
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  if (!initialized) return <div>Cargando sesión...</div>;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
 };

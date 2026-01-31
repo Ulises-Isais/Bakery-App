@@ -24,6 +24,8 @@ import {
   Inventory as InventoryIcon,
   MonetizationOn as MonetizationOnIcon,
 } from "@mui/icons-material";
+import { useAppDispatch } from "../hooks/hooks";
+import { logout } from "../store/auth/authSlice";
 
 const drawerWidth = 240;
 
@@ -39,6 +41,13 @@ export const Sidebar = ({ children }: { children?: React.ReactNode }) => {
 
   const navigate = useNavigate();
 
+  const dispatch = useAppDispatch();
+  const handleLogout = () => {
+    dispatch(logout());
+    localStorage.removeItem("token");
+    navigate("/login", { replace: true });
+  };
+
   const drawer = (
     <div>
       <Toolbar />
@@ -48,10 +57,18 @@ export const Sidebar = ({ children }: { children?: React.ReactNode }) => {
           { text: "Ventas", icon: <MonetizationOnIcon />, path: "/sales" },
           { text: "Inventario", icon: <InventoryIcon />, path: "/inventory" },
           { text: "Gráficas", icon: <ShowChartIcon />, path: "/graphics" },
-          { text: "Salir", icon: <LogoutIcon />, path: "/login" },
+          { text: "Salir", icon: <LogoutIcon />, action: handleLogout },
         ].map((item) => (
           <ListItem key={item.text} disablePadding>
-            <ListItemButton onClick={() => navigate(item.path)}>
+            <ListItemButton
+              onClick={() => {
+                if (item.action) {
+                  item.action();
+                } else {
+                  navigate(item.path);
+                }
+              }}
+            >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>

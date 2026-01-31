@@ -1,17 +1,27 @@
-import { Link } from "react-router";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
+
 import { TextInput } from "../components";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
-import {
-  changePasswordFailure,
-  changePasswordStart,
-  changePasswordSuccess,
-} from "../store/auth/forgotSlice";
+import { changePassword, resetPasswordState } from "../store/auth/forgotSlice";
 
 export const ForgotPage = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { loading, success, error } = useAppSelector((state) => state.forgot);
+
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        dispatch(resetPasswordState());
+        navigate("/login");
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [success, dispatch, navigate]);
 
   return (
     <div className="container-fluid">
@@ -37,21 +47,12 @@ export const ForgotPage = () => {
                   password2: "",
                 }}
                 onSubmit={async (values) => {
-                  dispatch(changePasswordStart());
-
-                  try {
-                    //Simulacion de API Call
-                    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-                    //Simula exito
-                    dispatch(changePasswordSuccess());
-                  } catch (error) {
-                    dispatch(
-                      changePasswordFailure("Error al cambiar la contraseña")
-                    );
-                  }
-
-                  console.log(values);
+                  dispatch(
+                    changePassword({
+                      username: values.username,
+                      password: values.password1,
+                    }),
+                  );
                 }}
                 validationSchema={Yup.object({
                   username: Yup.string().required("Ingresa el usuario"),
@@ -63,7 +64,7 @@ export const ForgotPage = () => {
                   password2: Yup.string()
                     .oneOf(
                       [Yup.ref("password1")],
-                      "Las contraseñas no coinciden"
+                      "Las contraseñas no coinciden",
                     )
                     .required("Ingresa la contraseña"),
                 })}

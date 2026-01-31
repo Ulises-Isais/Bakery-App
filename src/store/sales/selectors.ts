@@ -66,3 +66,10 @@ export const selectTotalRepartidoresFromTable = createSelector(
     );
   },
 );
+
+export const selectDespachoSinRefri = createSelector(
+  (state: RootState) => state.salesDespacho.despacho,
+  (_: RootState, turno: "mañana" | "tarde") => turno,
+  (despacho, turno) =>
+    despacho.filter((d) => d.turno === turno && d.id_categoria !== 8),
+);

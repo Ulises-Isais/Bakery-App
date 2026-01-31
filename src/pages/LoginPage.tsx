@@ -24,7 +24,7 @@ interface LoginFormValues {
 export const LoginPage = () => {
   const dispatch = useAppDispatch();
   const { loading, error, isAuthenticated } = useAppSelector(
-    (state) => state.auth
+    (state) => state.auth,
   );
 
   const navigate = useNavigate();
@@ -72,14 +72,14 @@ export const LoginPage = () => {
                     localStorage.setItem("token", data.token);
 
                     dispatch(
-                      loginSuccess({ user: data.user, token: data.token })
+                      loginSuccess({ user: data.user, token: data.token }),
                     );
                   } catch (error: any) {
                     dispatch(
                       loginFailure(
                         error.response?.data?.msg ||
-                          "Credenciales invalidas o error en el servidor"
-                      )
+                          "Credenciales invalidas o error en el servidor",
+                      ),
                     );
                   }
                 }}

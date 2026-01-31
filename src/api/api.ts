@@ -9,7 +9,7 @@ const appApi = axios.create({
 
 // Interceptor para agregar el token a todas las peticiones
 appApi.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = localStorage.getItem("x-token");
+  const token = localStorage.getItem("token");
 
   if (token) {
     // Si headers tiene el método set() (AxiosHeaders)

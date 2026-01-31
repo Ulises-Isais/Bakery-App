@@ -8,8 +8,11 @@ import {
   GraphicsPage,
 } from "../pages";
 import { PrivateRoute } from "../components";
+import { useInitAuth } from "../hooks/useInitAuth";
 
 export const Navigation = () => {
+  useInitAuth();
+
   return (
     <BrowserRouter>
       <Routes>

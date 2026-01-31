@@ -10,6 +10,7 @@ import { fetchDespacho } from "../store/sales/salesDespachoSlice";
 import { formatMoney } from "../helpers";
 import { fetchSalesCards } from "../store/sales/salesSliceCards";
 import {
+  selectDespachoSinRefri,
   selectRepartidoresTable,
   selectTotalRepartidoresFromTable,
 } from "../store/sales/selectors";
@@ -22,6 +23,13 @@ export const SalesPage = () => {
 
   const { loading, error, despacho } = useAppSelector(
     (state) => state.salesDespacho,
+  );
+
+  const tableManana = useAppSelector((state) =>
+    selectDespachoSinRefri(state, "mañana"),
+  );
+  const tableTarde = useAppSelector((state) =>
+    selectDespachoSinRefri(state, "tarde"),
   );
 
   const { totalesPorTurno } = useAppSelector((state) => state.salesCards);
@@ -45,10 +53,8 @@ export const SalesPage = () => {
     return <Typography color="error">Error: {error}</Typography>;
   }
 
-  const despachoManana = despacho.filter((d) => d.turno === "mañana");
-  const despachoTarde = despacho.filter((d) => d.turno === "tarde");
-
-  const despachoPorTurno = despacho.filter((d) => d.turno === user?.turno);
+  // const despachoManana = despacho.filter((d) => d.turno === "mañana");
+  // const despachoTarde = despacho.filter((d) => d.turno === "tarde");
 
   const cardsToShow = [];
   if (user?.role === "admin") {
@@ -112,7 +118,7 @@ export const SalesPage = () => {
               "Vendido",
               "Total",
             ]}
-            rows={despachoManana.map((d) => [
+            rows={tableManana.map((d) => [
               d.categoria,
               d.producto,
               d.cantidad_inicial,
@@ -133,7 +139,7 @@ export const SalesPage = () => {
               "Vendido",
               "Total",
             ]}
-            rows={despachoTarde.map((d) => [
+            rows={tableTarde.map((d) => [
               d.categoria,
               d.producto,
               d.cantidad_inicial,
@@ -157,15 +163,17 @@ export const SalesPage = () => {
             "Vendido",
             "Total",
           ]}
-          rows={despachoPorTurno.map((d) => [
-            d.categoria,
-            d.producto,
-            d.cantidad_inicial,
-            d.ingreso,
-            d.quedan,
-            d.vendido,
-            formatMoney(d.total),
-          ])}
+          rows={(user.turno === "mañana" ? tableManana : tableTarde).map(
+            (d) => [
+              d.categoria,
+              d.producto,
+              d.cantidad_inicial,
+              d.ingreso,
+              d.quedan,
+              d.vendido,
+              formatMoney(d.total),
+            ],
+          )}
         />
       )}
 
@@ -173,6 +181,7 @@ export const SalesPage = () => {
         title={"Leche"}
         headers={[
           "Categoria",
+          "Producto",
           "Precio",
           "Cantidad",
           "Ingresan",
@@ -180,7 +189,18 @@ export const SalesPage = () => {
           "Consumo",
           "Total",
         ]}
-        rows={[]}
+        rows={despacho
+          .filter((d) => d.id_categoria === 8)
+          .map((d) => [
+            d.categoria,
+            d.producto,
+            formatMoney(d.precio),
+            d.cantidad_inicial,
+            d.ingreso,
+            d.quedan,
+            d.vendido,
+            formatMoney(d.total),
+          ])}
       />
       <DataTable
         title={"Repartidores"}
@@ -190,9 +210,9 @@ export const SalesPage = () => {
           "Cantidad",
           "Extra",
           "Regreso",
-          "$$$ Regreso",
+          "$ Regreso",
           "Cambios",
-          "$$$ Cambios",
+          "$ Cambios",
           "Total",
           "Debe",
         ]}
