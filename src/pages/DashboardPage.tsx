@@ -13,7 +13,8 @@ import { selectTotalGeneralConRepartidores } from "../store/sales/selectors";
 export const DashboardPage = () => {
   const dispatch = useAppDispatch();
 
-  // Estado del slice
+  const { user } = useAppSelector((state) => state.auth);
+
   const {
     repartidores,
     loading: loadingSales,
@@ -27,7 +28,9 @@ export const DashboardPage = () => {
   const manana = turnos["mañana"];
   const tarde = turnos["tarde"];
 
-  // Llamada al backend al montar el componente
+  const isAdmin = user?.role === "admin";
+  const isDespacho = user?.role === "despacho";
+  const turno = user?.turno; // mañana || tarde
 
   useEffect(() => {
     dispatch(fetchSales());
@@ -42,6 +45,35 @@ export const DashboardPage = () => {
     return <Typography color="error">Error: {errorSales}</Typography>;
   }
 
+  const cards = [];
+
+  if (isAdmin) {
+    cards.push(
+      {
+        title: "Ventas mañana",
+        value: manana?.total ?? 0,
+      },
+      {
+        title: "Ventas tarde",
+        value: tarde?.total ?? 0,
+      },
+      {
+        title: "Ventas repartidores",
+        value: repartidores.reduce((a, r) => a + r.total, 0),
+      },
+      {
+        title: "Total general",
+        value: totalGeneralFinal,
+      },
+    );
+  }
+  if (isDespacho) {
+    cards.push({
+      title: turno === "mañana" ? "Venta mañana" : "Venta tarde",
+      value: turno === "mañana" ? manana?.total : tarde?.total,
+      color: "#333382",
+    });
+  }
   return (
     <Sidebar>
       <Typography variant="h4" gutterBottom>
@@ -49,67 +81,66 @@ export const DashboardPage = () => {
       </Typography>
       <Grid container spacing={3} mb={4}>
         <Grid size={{ xs: 12, md: 4 }}>
-          <Cards
-            title="Total venta repartidores"
-            value={formatMoney(
-              repartidores.reduce((acc, r) => acc + r.total, 0)
-            )}
-            color="#5A5E9C"
-          />
-        </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Cards
-            title="Ventas Mañana"
-            value={formatMoney(manana?.total ?? 0)}
-            color="#333382"
-          />
-        </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Cards
-            title="Ventas Tarde"
-            value={formatMoney(tarde?.total ?? 0)}
-            color="#2b348c"
-          />
-        </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Cards
-            title="Total General"
-            value={formatMoney(totalGeneralFinal)} //TODO Cambiar colores de las cards
-            color="#333382"
-          />
+          {cards.map((card, i) => (
+            <Grid key={i} size={{ xs: 12, md: 4 }}>
+              <Cards
+                title={card.title}
+                value={formatMoney(card.value)}
+                color={"#333382"}
+              />
+            </Grid>
+          ))}
         </Grid>
       </Grid>
-      <DataTable
-        title="Repartidores"
-        headers={["Nombre", "Regreso", "Cambios", "Extra", "Notas", "Total"]}
-        rows={repartidores.map((r) => [
-          r.nombre,
-          r.regreso,
-          r.cambios,
-          r.extra,
-          formatMoney(r.notas),
-          formatMoney(r.total),
-        ])}
-      />
-      <DataTable
-        title="Despacho mañana"
-        headers={["Categoría", "Total Categoría"]}
-        rows={
-          manana
-            ? manana.categorias.map((c) => [c.categoria, formatMoney(c.total)])
-            : []
-        }
-      />
 
-      <DataTable
-        title="Despacho tarde"
-        headers={["Categoría", "Total Categoría"]}
-        rows={
-          tarde
-            ? tarde.categorias.map((c) => [c.categoria, formatMoney(c.total)])
-            : []
-        }
-      />
+      {isAdmin && (
+        <>
+          <DataTable
+            title="Repartidores"
+            headers={[
+              "Nombre",
+              "Regreso",
+              "Cambios",
+              "Extra",
+              "Notas",
+              "Total",
+            ]}
+            rows={repartidores.map((r) => [
+              r.nombre,
+              r.regreso,
+              r.cambios,
+              r.extra,
+              formatMoney(r.notas),
+              formatMoney(r.total),
+            ])}
+          />
+          <DataTable
+            title="Despacho mañana"
+            headers={["Categoría", "Total Categoría"]}
+            rows={
+              manana
+                ? manana.categorias.map((c) => [
+                    c.categoria,
+                    formatMoney(c.total),
+                  ])
+                : []
+            }
+          />
+
+          <DataTable
+            title="Despacho tarde"
+            headers={["Categoría", "Total Categoría"]}
+            rows={
+              tarde
+                ? tarde.categorias.map((c) => [
+                    c.categoria,
+                    formatMoney(c.total),
+                  ])
+                : []
+            }
+          />
+        </>
+      )}
     </Sidebar>
   );
 };

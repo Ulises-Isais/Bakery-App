@@ -21,6 +21,10 @@ export const SalesPage = () => {
 
   const { user } = useAppSelector((state) => state.auth);
 
+  const isAdmin = user?.role === "admin";
+  const isDespacho = user?.role === "despacho";
+  const turno = user?.turno; // mañana || tarde
+
   const { loading, error, despacho } = useAppSelector(
     (state) => state.salesDespacho,
   );
@@ -57,7 +61,7 @@ export const SalesPage = () => {
   // const despachoTarde = despacho.filter((d) => d.turno === "tarde");
 
   const cardsToShow = [];
-  if (user?.role === "admin") {
+  if (isAdmin) {
     cardsToShow.push(
       {
         title: "Venta mañana",
@@ -77,13 +81,11 @@ export const SalesPage = () => {
     );
   }
 
-  if (user?.role === "despacho") {
+  if (isDespacho) {
     cardsToShow.push({
-      title: user.turno === "mañana" ? "Venta mañana" : "Venta tarde",
+      title: turno === "mañana" ? "Venta mañana" : "Venta tarde",
       value:
-        user.turno === "mañana"
-          ? totalesPorTurno?.mañana
-          : totalesPorTurno?.tarde,
+        turno === "mañana" ? totalesPorTurno?.mañana : totalesPorTurno?.tarde,
       color: "#333382",
     });
   }
@@ -105,7 +107,7 @@ export const SalesPage = () => {
         ))}
       </Grid>
       {/* Tablas */}
-      {user?.role === "admin" && (
+      {isAdmin && (
         <>
           <DataTable
             title="Despacho mañana"
@@ -151,9 +153,9 @@ export const SalesPage = () => {
           />
         </>
       )}
-      {user?.role === "despacho" && (
+      {isDespacho && (
         <DataTable
-          title={`Despacho ${user.turno}`}
+          title={`Despacho ${turno}`}
           headers={[
             "Categoria",
             "Producto",
@@ -163,17 +165,15 @@ export const SalesPage = () => {
             "Vendido",
             "Total",
           ]}
-          rows={(user.turno === "mañana" ? tableManana : tableTarde).map(
-            (d) => [
-              d.categoria,
-              d.producto,
-              d.cantidad_inicial,
-              d.ingreso,
-              d.quedan,
-              d.vendido,
-              formatMoney(d.total),
-            ],
-          )}
+          rows={(turno === "mañana" ? tableManana : tableTarde).map((d) => [
+            d.categoria,
+            d.producto,
+            d.cantidad_inicial,
+            d.ingreso,
+            d.quedan,
+            d.vendido,
+            formatMoney(d.total),
+          ])}
         />
       )}
 
@@ -202,33 +202,36 @@ export const SalesPage = () => {
             formatMoney(d.total),
           ])}
       />
-      <DataTable
-        title={"Repartidores"}
-        headers={[
-          "Nombre",
-          "Categoria",
-          "Cantidad",
-          "Extra",
-          "Regreso",
-          "$ Regreso",
-          "Cambios",
-          "$ Cambios",
-          "Total",
-          "Debe",
-        ]}
-        rows={repartidoresRows.map((r) => [
-          r.nombre,
-          r.categoria,
-          r.cantidad,
-          r.extra,
-          r.regreso,
-          formatMoney(r.totalRegreso),
-          r.cambios,
-          formatMoney(r.totalCambios),
-          formatMoney(r.total),
-          formatMoney(r.debe),
-        ])}
-      />
+
+      {isAdmin && (
+        <DataTable
+          title={"Repartidores"}
+          headers={[
+            "Nombre",
+            "Categoria",
+            "Cantidad",
+            "Extra",
+            "Regreso",
+            "$ Regreso",
+            "Cambios",
+            "$ Cambios",
+            "Total",
+            "Debe",
+          ]}
+          rows={repartidoresRows.map((r) => [
+            r.nombre,
+            r.categoria,
+            r.cantidad,
+            r.extra,
+            r.regreso,
+            formatMoney(r.totalRegreso),
+            r.cambios,
+            formatMoney(r.totalCambios),
+            formatMoney(r.total),
+            formatMoney(r.debe),
+          ])}
+        />
+      )}
     </Sidebar>
   );
 };

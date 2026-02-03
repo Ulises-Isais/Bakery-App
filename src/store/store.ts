@@ -5,6 +5,7 @@ import salesSlice from "./sales/salesSlice";
 import salesCardSlice from "./sales/salesSliceCards";
 import despachoSlice from "./sales/salesDespachoSlice";
 import salesRepartidoresTableSlice from "./sales/salesRepartidoresTableSlice";
+import inventorySlice from "./inventory/inventorySlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     salesCards: salesCardSlice,
     salesDespacho: despachoSlice,
     salesRepartidoresTableSlice,
+    inventory: inventorySlice,
   },
 });
 
