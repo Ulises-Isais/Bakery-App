@@ -80,19 +80,17 @@ export const DashboardPage = () => {
         Inicio
       </Typography>
       <Grid container spacing={3} mb={4}>
-        <Grid size={{ xs: 12, md: 4 }}>
-          {cards.map((card, i) => (
-            <Grid key={i} size={{ xs: 12, md: 4 }}>
-              <Cards
-                title={card.title}
-                value={formatMoney(card.value)}
-                color={"#333382"}
-              />
-            </Grid>
-          ))}
-        </Grid>
+        {cards.map((card, i) => (
+          <Grid key={i} size={{ xs: 12, md: 4 }}>
+            <Cards
+              title={card.title}
+              value={formatMoney(card.value)}
+              color={"#333382"}
+            />
+          </Grid>
+        ))}
       </Grid>
-
+      {/* Mostrar tablas a admin */}
       {isAdmin && (
         <>
           <DataTable
@@ -140,6 +138,30 @@ export const DashboardPage = () => {
             }
           />
         </>
+      )}
+      {/* // Mostrar tabla a Despacho turno mañana */}
+      {isDespacho && turno === "mañana" && (
+        <DataTable
+          title="Despacho mañana"
+          headers={["Categoría", "Total"]}
+          rows={
+            manana?.categorias.map((c) => [
+              c.categoria,
+              formatMoney(c.total),
+            ]) || []
+          }
+        />
+      )}
+      {/* // Mostrar tabla a Despacho turno tarde */}
+      {isDespacho && turno === "tarde" && (
+        <DataTable
+          title="Despacho tarde"
+          headers={["Categoría", "Total"]}
+          rows={
+            tarde?.categorias.map((c) => [c.categoria, formatMoney(c.total)]) ||
+            []
+          }
+        />
       )}
     </Sidebar>
   );
