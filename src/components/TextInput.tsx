@@ -4,7 +4,7 @@ import "../styles/login.css";
 interface Props {
   label: string;
   name: string;
-  type?: "text" | "password";
+  type?: React.InputHTMLAttributes<HTMLInputElement>["type"];
   placeholder?: string;
   className?: string;
   [x: string]: any;

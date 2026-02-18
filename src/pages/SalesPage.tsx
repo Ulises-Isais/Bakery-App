@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { Grid, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Button, Grid, Typography } from "@mui/material";
 
 import { Sidebar } from "../components";
 import { Cards } from "../components/Cards";
@@ -15,6 +15,9 @@ import {
   selectTotalRepartidoresFromTable,
 } from "../store/sales/selectors";
 import { fetchSalesRepartidoresTable } from "../store/sales/salesRepartidoresTableSlice";
+import { AddCharolasModal } from "../components/modals/AddCharolasModal";
+import { fetchCategorias } from "../store/catalogs/categoriesSlice";
+import { fetchRepartidores } from "../store/catalogs/repartidoresSlice";
 
 export const SalesPage = () => {
   const dispatch = useAppDispatch();
@@ -24,6 +27,10 @@ export const SalesPage = () => {
   const isAdmin = user?.role === "admin";
   const isDespacho = user?.role === "despacho";
   const turno = user?.turno; // mañana || tarde
+
+  const [openCharolas, setOpenCharolas] = useState(false);
+  const [openCorte, setOpenCorte] = useState(false);
+  const [openRepartidores, setOpenRepartidores] = useState(false);
 
   const { loading, error, despacho } = useAppSelector(
     (state) => state.salesDespacho,
@@ -47,7 +54,15 @@ export const SalesPage = () => {
     dispatch(fetchDespacho({ fecha: "2025-09-12" }));
     dispatch(fetchSalesCards({ fecha: "2025-09-12" }));
     dispatch(fetchSalesRepartidoresTable({ fecha: "2025-09-12" }));
+    dispatch(fetchCategorias());
+    dispatch(fetchRepartidores());
   }, [dispatch]);
+
+  const refreshData = () => {
+    dispatch(fetchDespacho({ fecha: "2025-09-12" }));
+    dispatch(fetchSalesCards({ fecha: "2025-09-12" }));
+    dispatch(fetchSalesRepartidoresTable({ fecha: "2025-09-12" }));
+  };
 
   if (loading && loadingRepartidores) {
     return <Typography>Cargando...</Typography>;
@@ -105,6 +120,45 @@ export const SalesPage = () => {
             />
           </Grid>
         ))}
+      </Grid>
+
+      <Grid container spacing={2} mb={4}>
+        {isAdmin && (
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={() => setOpenCharolas(true)}
+            >
+              Agregar charolas
+            </Button>
+          </Grid>
+        )}
+
+        {isAdmin ||
+          (isDespacho && (
+            <Grid size={{ xs: 12, md: 4 }}>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={() => setOpenCorte(true)}
+              >
+                Corte despacho
+              </Button>
+            </Grid>
+          ))}
+
+        {isAdmin && (
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={() => setOpenRepartidores(true)}
+            >
+              Contar repartidores
+            </Button>
+          </Grid>
+        )}
       </Grid>
       {/* Tablas */}
       {isAdmin && (
@@ -232,6 +286,13 @@ export const SalesPage = () => {
           ])}
         />
       )}
+      <AddCharolasModal
+        open={openCharolas}
+        onClose={() => {
+          setOpenCharolas(false);
+          refreshData();
+        }}
+      />
     </Sidebar>
   );
 };
