@@ -15,7 +15,20 @@ export const TextInput = ({ label, ...props }: Props) => {
 
   return (
     <div className="row">
-      <input {...field} {...props} />
+      <input
+        {...field}
+        {...props}
+        min={props.type === "number" ? 0 : undefined}
+        onKeyDown={(e) => {
+          if (
+            props.type === "number" &&
+            (e.key === "-" || e.key === "e" || e.key === "+")
+          ) {
+            e.preventDefault();
+          }
+          props.onKeyDown?.(e);
+        }}
+      />
       <ErrorMessage name={props.name} component="span" className="error-text" />
     </div>
   );

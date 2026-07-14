@@ -41,6 +41,7 @@ const repartidoresSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchRepartidores.fulfilled, (state, action) => {
+        console.log(action.payload);
         state.loading = false;
         state.items = action.payload;
       })
