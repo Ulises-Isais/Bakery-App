@@ -6,12 +6,14 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Form, Formik } from "formik";
+import { FieldArray, Form, Formik } from "formik";
 import * as Yup from "yup";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import { TextInput } from "../TextInput";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { addCharolas } from "../../store/sales/charolasSlice";
+import { SelectInput } from "../SelectInput";
 
 interface Props {
   open: boolean;
@@ -39,7 +41,15 @@ export const AddCharolasModal = ({ open, onClose }: Props) => {
           Agregar charolas
         </Typography>
         <Formik
-          initialValues={{ repartidor: "", producto: "", cantidad: "" }}
+          initialValues={{
+            repartidor: "",
+            productos: [
+              {
+                producto: "",
+                cantidad: "",
+              },
+            ],
+          }}
           validationSchema={Yup.object({
             producto: Yup.string().required("Selecciona un producto"),
             repartidor: Yup.string().required("Selecciona un repartidor"),
@@ -50,9 +60,12 @@ export const AddCharolasModal = ({ open, onClose }: Props) => {
           })}
           onSubmit={async (values, { resetForm }) => {
             const payload = {
-              id_categoria: Number(values.producto),
               id_repartidor: Number(values.repartidor),
-              cantidad: Number(values.cantidad),
+
+              productos: values.productos.map((p) => ({
+                id_categoria: Number(p.producto),
+                cantidad: Number(p.cantidad),
+              })),
             };
 
             const result = await dispatch(addCharolas(payload));
@@ -102,36 +115,78 @@ export const AddCharolasModal = ({ open, onClose }: Props) => {
               </TextField>
 
               {/* Select producto */}
-              <TextField
-                select
-                fullWidth
-                name="producto"
-                label="Producto"
-                value={values.producto}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.producto && Boolean(errors.producto)}
-                helperText={touched.producto && errors.producto}
-                sx={{ mb: 2 }}
-              >
-                <MenuItem value="">Selecciona un producto</MenuItem>
-                {categorias.map((cat) => (
-                  <MenuItem
-                    key={cat.id_categoria}
-                    value={cat.id_categoria.toString()}
-                  >
-                    {cat.nombre}
-                  </MenuItem>
-                ))}
-              </TextField>
+              <FieldArray name="productos">
+                {({ push, remove }) => (
+                  <>
+                    {values.productos.map((_, index) => (
+                      <Box key={index} mb={2}>
+                        {/* Select */}
+                        <SelectInput
+                          name={`productos.${index}.producto`}
+                          label="Producto"
+                          sx={{ mb: 2 }}
+                        >
+                          <MenuItem value="">Selecciona un producto</MenuItem>
+                          {categorias.map((cat) => {
+                            const selected = values.productos.some(
+                              (p, i) =>
+                                i !== index &&
+                                p.producto === cat.id_categoria.toString(),
+                            );
 
-              {/* Cantidad */}
-              <TextInput
-                name="cantidad"
-                label="Cantidad"
-                type="number"
-                placeholder="0"
-              />
+                            return (
+                              <MenuItem
+                                key={cat.id_categoria}
+                                value={cat.id_categoria.toString()}
+                                disabled={selected}
+                              >
+                                {cat.nombre}
+                              </MenuItem>
+                            );
+                          })}
+                        </SelectInput>
+
+                        {/* Cantidad */}
+                        <TextInput
+                          name={`productos.${index}.cantidad`}
+                          label="Cantidad"
+                          type="number"
+                          placeholder="0"
+                        />
+                        {values.productos.length > 1 && (
+                          <Box
+                            mt={1}
+                            display={"flex"}
+                            justifyContent={"flex-end"}
+                          >
+                            <Button
+                              type="button"
+                              color="error"
+                              startIcon={<DeleteIcon />}
+                              onClick={() => remove(index)}
+                            >
+                              Eliminar
+                            </Button>
+                          </Box>
+                        )}
+                      </Box>
+                    ))}
+
+                    <Button
+                      type="button"
+                      variant="outlined"
+                      onClick={() => {
+                        push({
+                          producto: "",
+                          cantidad: "",
+                        });
+                      }}
+                    >
+                      + Agregar producto
+                    </Button>
+                  </>
+                )}
+              </FieldArray>
 
               <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
                 <Button onClick={onClose} variant="outlined">

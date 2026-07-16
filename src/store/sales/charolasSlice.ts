@@ -1,12 +1,17 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import appApi from "../../api/api";
 
+type AddCharolasPayload = {
+  id_repartidor: number;
+  productos: {
+    id_categoria: number;
+    cantidad: number;
+  }[];
+};
+
 export const addCharolas = createAsyncThunk(
   "sales/addCharolas",
-  async (
-    payload: { id_categoria: number; id_repartidor: number; cantidad: number },
-    { rejectWithValue },
-  ) => {
+  async (payload: AddCharolasPayload, { rejectWithValue }) => {
     try {
       await appApi.post("sales/charolas", payload);
       return true;
