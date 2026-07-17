@@ -18,9 +18,16 @@ import { SelectInput } from "../SelectInput";
 interface Props {
   open: boolean;
   onClose: () => void;
+  onSuccess: (message: string) => void;
+  onError: (message: string) => void;
 }
 
-export const AddCharolasModal = ({ open, onClose }: Props) => {
+export const AddCharolasModal = ({
+  open,
+  onClose,
+  onSuccess,
+  onError,
+}: Props) => {
   const dispatch = useAppDispatch();
   // leer categorias y repartidores
   const categorias = useAppSelector((state) => state.categorias.items);
@@ -51,12 +58,17 @@ export const AddCharolasModal = ({ open, onClose }: Props) => {
             ],
           }}
           validationSchema={Yup.object({
-            producto: Yup.string().required("Selecciona un producto"),
             repartidor: Yup.string().required("Selecciona un repartidor"),
-            cantidad: Yup.number()
+            productos: Yup.array().of(
+              Yup.object({
+                producto: Yup.string().required("Selecciona un producto"),
 
-              .min(1, "Debe ser mayor a 0")
-              .required("Cantidad requerida"),
+                cantidad: Yup.number()
+                  .typeError("Cantidad requerida")
+                  .min(1, "Debe ser mayor a 0")
+                  .required("Cantidad requerida"),
+              }),
+            ),
           })}
           onSubmit={async (values, { resetForm }) => {
             const payload = {
@@ -72,11 +84,12 @@ export const AddCharolasModal = ({ open, onClose }: Props) => {
 
             if (addCharolas.fulfilled.match(result)) {
               resetForm();
+              onSuccess("Charolas registradas correctamente");
               onClose(); // dispara refresh
             }
 
             if (addCharolas.rejected.match(result)) {
-              // aquí puedes mostrar snackbar / alert
+              onError("No fue posible registrar las charolas");
             }
           }}
         >

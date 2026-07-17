@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Grid, Typography } from "@mui/material";
 
-import { Sidebar } from "../components";
+import { Sidebar, SnackbarAlert } from "../components";
 import { Cards } from "../components/Cards";
 import { DataTable } from "../components/DataTable";
 
@@ -31,6 +31,11 @@ export const SalesPage = () => {
   const [openCharolas, setOpenCharolas] = useState(false);
   const [openCorte, setOpenCorte] = useState(false);
   const [openRepartidores, setOpenRepartidores] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error" | "warning" | "info",
+  });
 
   const { loading, error, despacho } = useAppSelector(
     (state) => state.salesDespacho,
@@ -292,7 +297,32 @@ export const SalesPage = () => {
           setOpenCharolas(false);
           refreshData();
         }}
+        onSuccess={(message) => {
+          setSnackbar({
+            open: true,
+            severity: "success",
+            message,
+          });
+        }}
+        onError={(message) => {
+          setSnackbar({
+            open: true,
+            severity: "error",
+            message,
+          });
+        }}
       />
+      <SnackbarAlert
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={() => {
+          setSnackbar((prev) => ({
+            ...prev,
+            open: false,
+          }));
+        }}
+      ></SnackbarAlert>
     </Sidebar>
   );
 };
