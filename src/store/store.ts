@@ -6,6 +6,7 @@ import salesCardSlice from "./sales/salesSliceCards";
 import despachoSlice from "./sales/salesDespachoSlice";
 import salesRepartidoresTableSlice from "./sales/salesRepartidoresTableSlice";
 import inventorySlice from "./inventory/inventorySlice";
+import salesCierreRepartidorSlice from "./sales/salesCierreRepartidorSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     salesDespacho: despachoSlice,
     salesRepartidoresTableSlice,
     inventory: inventorySlice,
+    salesCierreRepartidor: salesCierreRepartidorSlice,
   },
 });
 

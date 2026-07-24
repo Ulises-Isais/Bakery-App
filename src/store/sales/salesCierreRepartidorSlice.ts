@@ -54,7 +54,7 @@ export const fetchCierreRepartidor = createAsyncThunk(
 
 // ===================
 // SLICE
-const salesCierresRepartidorSlice = createSlice({
+const salesCierreRepartidorSlice = createSlice({
   name: "salesCierreRepartidor",
   initialState,
   reducers: {
@@ -82,6 +82,6 @@ const salesCierresRepartidorSlice = createSlice({
   },
 });
 
-export const { clearCierreRepartidor } = salesCierresRepartidorSlice.actions;
+export const { clearCierreRepartidor } = salesCierreRepartidorSlice.actions;
 
-export default salesCierresRepartidorSlice.reducer;
+export default salesCierreRepartidorSlice.reducer;
