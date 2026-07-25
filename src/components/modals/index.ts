@@ -1,0 +1,1 @@
+export { CierreRepartidorTable } from "./CierreRepartidorTable";

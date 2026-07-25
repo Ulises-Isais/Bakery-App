@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import appApi from "../../api/api";
 
-interface CharolaRepartidor {
-  id_charola: string;
+export interface CharolaRepartidor {
+  id_charola: number;
   id_categoria: number;
   categoria: string;
   cantidad: number;
