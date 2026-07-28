@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { Grid, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Button, Grid, Typography } from "@mui/material";
 
-import { Sidebar } from "../components";
+import { Sidebar, SnackbarAlert } from "../components";
 import { Cards } from "../components/Cards";
 import { DataTable } from "../components/DataTable";
 
@@ -15,6 +15,10 @@ import {
   selectTotalRepartidoresFromTable,
 } from "../store/sales/selectors";
 import { fetchSalesRepartidoresTable } from "../store/sales/salesRepartidoresTableSlice";
+import { AddCharolasModal } from "../components/modals/AddCharolasModal";
+import { fetchCategorias } from "../store/catalogs/categoriesSlice";
+import { fetchRepartidores } from "../store/catalogs/repartidoresSlice";
+import { CierreRepartidorModal } from "../components/modals/CierreRepartidorModal";
 
 export const SalesPage = () => {
   const dispatch = useAppDispatch();
@@ -24,6 +28,17 @@ export const SalesPage = () => {
   const isAdmin = user?.role === "admin";
   const isDespacho = user?.role === "despacho";
   const turno = user?.turno; // mañana || tarde
+  // Admin agregar charolas
+  const [openCharolas, setOpenCharolas] = useState(false);
+  // Usuario Corte de despacho
+  const [openCorte, setOpenCorte] = useState(false);
+  // Corte de repartidores
+  const [openDriverSettlement, setopenDriverSettlement] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error" | "warning" | "info",
+  });
 
   const { loading, error, despacho } = useAppSelector(
     (state) => state.salesDespacho,
@@ -47,7 +62,15 @@ export const SalesPage = () => {
     dispatch(fetchDespacho({ fecha: "2025-09-12" }));
     dispatch(fetchSalesCards({ fecha: "2025-09-12" }));
     dispatch(fetchSalesRepartidoresTable({ fecha: "2025-09-12" }));
+    dispatch(fetchCategorias());
+    dispatch(fetchRepartidores());
   }, [dispatch]);
+
+  const refreshData = () => {
+    dispatch(fetchDespacho({ fecha: "2025-09-12" }));
+    dispatch(fetchSalesCards({ fecha: "2025-09-12" }));
+    dispatch(fetchSalesRepartidoresTable({ fecha: "2025-09-12" }));
+  };
 
   if (loading && loadingRepartidores) {
     return <Typography>Cargando...</Typography>;
@@ -105,6 +128,45 @@ export const SalesPage = () => {
             />
           </Grid>
         ))}
+      </Grid>
+
+      <Grid container spacing={2} mb={4}>
+        {isAdmin && (
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={() => setOpenCharolas(true)}
+            >
+              Agregar charolas
+            </Button>
+          </Grid>
+        )}
+
+        {isAdmin ||
+          (isDespacho && (
+            <Grid size={{ xs: 12, md: 4 }}>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={() => setOpenCorte(true)}
+              >
+                Corte despacho
+              </Button>
+            </Grid>
+          ))}
+
+        {isAdmin && (
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={() => setopenDriverSettlement(true)}
+            >
+              Cierre repartidores
+            </Button>
+          </Grid>
+        )}
       </Grid>
       {/* Tablas */}
       {isAdmin && (
@@ -232,6 +294,42 @@ export const SalesPage = () => {
           ])}
         />
       )}
+      <AddCharolasModal
+        open={openCharolas}
+        onClose={() => {
+          setOpenCharolas(false);
+          refreshData();
+        }}
+        onSuccess={(message) => {
+          setSnackbar({
+            open: true,
+            severity: "success",
+            message,
+          });
+        }}
+        onError={(message) => {
+          setSnackbar({
+            open: true,
+            severity: "error",
+            message,
+          });
+        }}
+      />
+      <CierreRepartidorModal
+        open={openDriverSettlement}
+        onClose={() => setopenDriverSettlement(false)}
+      />
+      <SnackbarAlert
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={() => {
+          setSnackbar((prev) => ({
+            ...prev,
+            open: false,
+          }));
+        }}
+      ></SnackbarAlert>
     </Sidebar>
   );
 };

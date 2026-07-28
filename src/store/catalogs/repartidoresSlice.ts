@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import appApi from "../../../api/api";
+import appApi from "../../api/api";
 
 interface Repartidor {
   id_repartidor: number;
