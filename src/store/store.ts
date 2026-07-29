@@ -9,6 +9,7 @@ import inventorySlice from "./inventory/inventorySlice";
 import salesCierreRepartidorSlice from "./sales/salesCierreRepartidorSlice";
 import categoriasSlice from "./catalogs/categoriesSlice";
 import repartidoresSlice from "./catalogs/repartidoresSlice";
+import salesDriverSettlementSlice from "./sales/salesDriverSettlement";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     categorias: categoriasSlice,
     repartidores: repartidoresSlice,
     salesCierreRepartidor: salesCierreRepartidorSlice,
+    salesDriverSettlement: salesDriverSettlementSlice,
   },
 });
 

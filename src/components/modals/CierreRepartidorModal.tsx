@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { SelectInput } from "../SelectInput";
 import { useState } from "react";
 import { CierreRepartidorTable } from "./CierreRepartidorTable";
+import type { SettlementFormValues } from "../../types/settlement";
 
 interface Props {
   open: boolean;
@@ -23,6 +24,15 @@ interface Props {
 }
 
 const DEFAULT_DATE = "2025-09-12";
+
+const initialValues: SettlementFormValues = {
+  repartidor: 0,
+  fecha: DEFAULT_DATE,
+  charolas: [],
+  total: 0,
+  dineroPendiente: 0,
+  notas: 0,
+};
 
 export const CierreRepartidorModal = ({ open, onClose }: Props) => {
   const dispatch = useAppDispatch();
@@ -58,14 +68,7 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
           Cierre de repartidor
         </Typography>
         <Formik
-          initialValues={{
-            repartidor: 0,
-            fecha: DEFAULT_DATE,
-            charolas: [],
-            total: "",
-            dineroPendiente: "",
-            notas: "",
-          }}
+          initialValues={initialValues}
           validationSchema={Yup.object({
             repartidor: Yup.number()
               .moreThan(0, "Selecciona un repartidor")
