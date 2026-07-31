@@ -1,15 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import appApi from "../../api/api";
-
-export interface CharolaRepartidor {
-  id_charola: number;
-  id_categoria: number;
-  categoria: string;
-  cantidad: number;
-}
+import type { SettlementCategoryApi } from "../../types/settlement";
 
 interface CierreRepartidorState {
-  charolas: CharolaRepartidor[];
+  charolas: SettlementCategoryApi[];
   loading: boolean;
   error: string | null;
 }
@@ -20,10 +14,18 @@ const initialState: CierreRepartidorState = {
   error: null,
 };
 
+interface FetchCierreRepartidorRequest {
+  id_repartidor: number;
+  fecha: string;
+}
+
 //===========================
 // THUNK
 
-export const fetchCierreRepartidor = createAsyncThunk(
+export const fetchCierreRepartidor = createAsyncThunk<
+  SettlementCategoryApi[],
+  FetchCierreRepartidorRequest
+>(
   "salesCierreRepartidor/fetchCierreRepartidor",
   async (
     {

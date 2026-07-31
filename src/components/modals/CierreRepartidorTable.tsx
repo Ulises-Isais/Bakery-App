@@ -8,13 +8,12 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
-import type { CharolaRepartidor } from "../../store/sales/salesCierreRepartidorSlice";
+import { useFormikContext } from "formik";
+import type { SettlementFormValues } from "../../types/settlement";
 
-interface Props {
-  charolas: CharolaRepartidor[];
-}
+export const CierreRepartidorTable = () => {
+  const { values, setFieldValue } = useFormikContext<SettlementFormValues>();
 
-export const CierreRepartidorTable = ({ charolas }: Props) => {
   return (
     <TableContainer component={Paper} sx={{ mt: 3 }}>
       <Table size="small">
@@ -28,18 +27,57 @@ export const CierreRepartidorTable = ({ charolas }: Props) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {charolas.map((ch) => (
+          {values.charolas.map((ch, index) => (
             <TableRow key={ch.id_charola}>
               <TableCell>{ch.categoria}</TableCell>
               <TableCell align="center">{ch.cantidad}</TableCell>
               <TableCell>
-                <TextField size="small" type="number" fullWidth />
+                <TextField
+                  size="small"
+                  type="number"
+                  fullWidth
+                  value={ch.cantidad_devuelta}
+                  onChange={(e) => {
+                    const value = e.target.value;
+
+                    setFieldValue(
+                      `charolas.${index}.cantidad_devuelta`,
+                      value === "" ? "" : Number(value),
+                    );
+                  }}
+                />
               </TableCell>
               <TableCell>
-                <TextField size="small" type="number" fullWidth />
+                <TextField
+                  size="small"
+                  type="number"
+                  fullWidth
+                  value={ch.cantidad_cambios}
+                  onChange={(e) => {
+                    const value = e.target.value;
+
+                    setFieldValue(
+                      `charolas.${index}.cantidad_cambios`,
+                      value === "" ? "" : Number(value),
+                    );
+                  }}
+                />
               </TableCell>
               <TableCell>
-                <TextField size="small" type="number" fullWidth />
+                <TextField
+                  size="small"
+                  type="number"
+                  fullWidth
+                  value={ch.extra}
+                  onChange={(e) => {
+                    const value = e.target.value;
+
+                    setFieldValue(
+                      `charolas.${index}.extra`,
+                      value === "" ? "" : Number(value),
+                    );
+                  }}
+                />
               </TableCell>
             </TableRow>
           ))}

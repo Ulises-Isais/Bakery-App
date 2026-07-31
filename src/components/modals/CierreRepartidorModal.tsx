@@ -6,7 +6,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Formik, Form } from "formik";
+import { Formik, Form, type FormikHelpers } from "formik";
 import * as Yup from "yup";
 import {
   clearCierreRepartidor,
@@ -29,9 +29,9 @@ const initialValues: SettlementFormValues = {
   repartidor: 0,
   fecha: DEFAULT_DATE,
   charolas: [],
-  total: 0,
-  dineroPendiente: 0,
-  notas: 0,
+  total: "",
+  dineroPendiente: "",
+  notas: "",
 };
 
 export const CierreRepartidorModal = ({ open, onClose }: Props) => {
@@ -39,9 +39,7 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
 
   const repartidores = useAppSelector((state) => state.repartidores.items);
 
-  const { charolas, loading } = useAppSelector(
-    (state) => state.salesCierreRepartidor,
-  );
+  const { loading } = useAppSelector((state) => state.salesCierreRepartidor);
 
   const [showSettlement, setShowSettlement] = useState(false);
 
@@ -50,6 +48,31 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
 
     setShowSettlement(false);
     onClose();
+  };
+
+  const handleSearch = async (
+    values: SettlementFormValues,
+    setFieldValue: FormikHelpers<SettlementFormValues>["setFieldValue"],
+  ) => {
+    const result = await dispatch(
+      fetchCierreRepartidor({
+        id_repartidor: Number(values.repartidor),
+        fecha: values.fecha,
+      }),
+    );
+
+    if (fetchCierreRepartidor.fulfilled.match(result)) {
+      const settlementCategories = result.payload.map((category) => ({
+        ...category,
+        cantidad_devuelta: "",
+        cantidad_cambios: "",
+        extra: "",
+      }));
+
+      setFieldValue("charolas", settlementCategories);
+
+      setShowSettlement(true);
+    }
   };
   return (
     <Dialog
@@ -67,7 +90,7 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
         <Typography variant="h6" mb={3}>
           Cierre de repartidor
         </Typography>
-        <Formik
+        <Formik<SettlementFormValues>
           initialValues={initialValues}
           validationSchema={Yup.object({
             repartidor: Yup.number()
@@ -76,34 +99,29 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
             // fecha: Yup.string().required("Selecciona una fecha"),
           })}
           onSubmit={async (values) => {
-            const result = await dispatch(
-              fetchCierreRepartidor({
-                id_repartidor: Number(values.repartidor),
-                fecha: values.fecha,
-              }),
-            );
+            const payload = {
+              id_repartidor: Number(values.repartidor),
+              fecha: values.fecha,
+              total: values.total === "" ? 0 : values.total,
+              dinero_pendiente:
+                values.dineroPendiente === "" ? 0 : values.dineroPendiente,
+              notas: values.notas === "" ? 0 : values.notas,
 
-            if (fetchCierreRepartidor.fulfilled.match(result)) {
-              setShowSettlement(true);
-            }
-
-            // const charolasFormulario = result.payload.map((charola) => ({
-            //   ...charola,
-            //   regresan: "",
-            //   cambios: "",
-            //   extras: "",
-            //   notas: "",
-            // }));
-
-            // setFieldValue("charolas", charolasFormulario)
-
-            // setShowSettlement(true)
+              categorias: values.charolas.map((cat) => ({
+                id_categoria: cat.id_categoria,
+                cantidad_devuelta:
+                  cat.cantidad_devuelta === "" ? 0 : cat.cantidad_devuelta,
+                cantidad_cambios:
+                  cat.cantidad_cambios === "" ? 0 : cat.cantidad_cambios,
+                extra: cat.extra === "" ? 0 : cat.extra,
+              })),
+            };
           }}
         >
-          {({ values, isSubmitting }) => (
+          {({ values, isSubmitting, setFieldValue }) => (
+            // console.log(values)
             <Form>
               {/* Repartidor */}
-
               <SelectInput name="repartidor" label="Repartidor" sx={{ mb: 2 }}>
                 <MenuItem value="">Selecciona un repartidor</MenuItem>
 
@@ -116,9 +134,7 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
                   </MenuItem>
                 ))}
               </SelectInput>
-
               {/* Fecha */}
-
               <TextField
                 fullWidth
                 disabled
@@ -126,46 +142,66 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
                 value={values.fecha}
                 sx={{ mb: 2 }}
               />
-
               {/* Buscar */}
-
               {!showSettlement && (
                 <Button
-                  type="submit"
+                  type="button"
                   variant="contained"
                   disabled={loading || isSubmitting}
+                  onClick={() => handleSearch(values, setFieldValue)}
                 >
                   Buscar
                 </Button>
               )}
-
               {/* Tabla */}
-
-              {showSettlement && <CierreRepartidorTable charolas={charolas} />}
-
+              {showSettlement && <CierreRepartidorTable />}
               {showSettlement && (
                 <Box sx={{ mt: 3 }}>
                   <Typography variant="h6" sx={{ mb: 2 }}>
                     Información de la venta
                   </Typography>
                   <Box display="flex" gap={2} sx={{ mb: 2 }}>
-                    <TextField fullWidth label="Total Vendido" type="number" />
+                    <TextField
+                      fullWidth
+                      label="Total Vendido"
+                      type="number"
+                      value={values.total}
+                      disabled
+                    />
                     <TextField
                       fullWidth
                       label="Dinero pendiente"
                       type="number"
+                      value={values.dineroPendiente}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setFieldValue(
+                          "dineroPendiente",
+                          value === "" ? "" : Number(value),
+                        );
+                      }}
                     />
                   </Box>
-                  <TextField fullWidth label="Notas" type="number" />
+                  <TextField
+                    fullWidth
+                    label="Notas"
+                    type="number"
+                    value={values.notas}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFieldValue("notas", value === "" ? "" : Number(value));
+                    }}
+                  />
                 </Box>
               )}
-
               <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
                 <Button variant="outlined" onClick={handleClose}>
                   Cancelar
                 </Button>
                 {showSettlement && (
-                  <Button variant="contained">Guardar cierre</Button>
+                  <Button type="submit" variant="contained">
+                    Guardar cierre
+                  </Button>
                 )}
               </Box>
             </Form>

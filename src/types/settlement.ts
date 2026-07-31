@@ -11,18 +11,18 @@ export interface SettlementCategoryApi {
 // Charola utilizada dentro del formulario
 
 export interface SettlementCategoryForm extends SettlementCategoryApi {
-  cantidad_devuelta: number;
-  cantidad_cambios: number;
-  extra: number;
+  cantidad_devuelta: number | "";
+  cantidad_cambios: number | "";
+  extra: number | "";
 }
 
 export interface SettlementFormValues {
   repartidor: number;
   fecha: string;
   charolas: SettlementCategoryForm[];
-  total: number;
-  dineroPendiente: number;
-  notas: number;
+  total: number | "";
+  dineroPendiente: number | "";
+  notas: number | "";
 }
 
 export interface DriverSettlementPayload {
