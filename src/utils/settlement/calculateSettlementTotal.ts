@@ -8,11 +8,13 @@ const CATEGORY_PRICES: Record<number, number> = {
 interface CalculateSettlementTotalParams {
   charolas: SettlementCategoryForm[];
   notas: number | "";
+  dineroPendiente: number | "";
 }
 
 export const calculateSettlementTotal = ({
   charolas,
   notas,
+  dineroPendiente,
 }: CalculateSettlementTotalParams): number => {
   let total = 0;
   for (const charola of charolas) {
@@ -30,6 +32,6 @@ export const calculateSettlementTotal = ({
   }
 
   total -= notas === "" ? 0 : notas;
-
+  total -= dineroPendiente === "" ? 0 : dineroPendiente;
   return total;
 };

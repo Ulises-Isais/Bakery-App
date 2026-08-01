@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { Formik, Form, type FormikHelpers } from "formik";
+
 import {
   Box,
   Button,
@@ -6,17 +9,21 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Formik, Form, type FormikHelpers } from "formik";
 import * as Yup from "yup";
+
+import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import {
   clearCierreRepartidor,
   fetchCierreRepartidor,
+  saveDriverSettlement,
 } from "../../store/sales/salesCierreRepartidorSlice";
-import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { SelectInput } from "../SelectInput";
-import { useState } from "react";
 import { CierreRepartidorTable } from "./CierreRepartidorTable";
-import type { SettlementFormValues } from "../../types/settlement";
+import type {
+  DriverSettlementPayload,
+  SettlementFormValues,
+} from "../../types/settlement";
+import { SettlementTotalCalculator } from "./SettlementTotalCalculator";
 
 interface Props {
   open: boolean;
@@ -99,7 +106,7 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
             // fecha: Yup.string().required("Selecciona una fecha"),
           })}
           onSubmit={async (values) => {
-            const payload = {
+            const payload: DriverSettlementPayload = {
               id_repartidor: Number(values.repartidor),
               fecha: values.fecha,
               total: values.total === "" ? 0 : values.total,
@@ -116,11 +123,19 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
                 extra: cat.extra === "" ? 0 : cat.extra,
               })),
             };
+
+            const result = await dispatch(saveDriverSettlement(payload));
+
+            if (saveDriverSettlement.fulfilled.match(result)) {
+              console.log("Cierre correctamente");
+            } else {
+              console.error(result.payload);
+            }
           }}
         >
           {({ values, isSubmitting, setFieldValue }) => (
-            // console.log(values)
             <Form>
+              <SettlementTotalCalculator />
               {/* Repartidor */}
               <SelectInput name="repartidor" label="Repartidor" sx={{ mb: 2 }}>
                 <MenuItem value="">Selecciona un repartidor</MenuItem>
@@ -164,9 +179,12 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
                     <TextField
                       fullWidth
                       label="Total Vendido"
-                      type="number"
                       value={values.total}
-                      disabled
+                      slotProps={{
+                        htmlInput: {
+                          readOnly: true,
+                        },
+                      }}
                     />
                     <TextField
                       fullWidth

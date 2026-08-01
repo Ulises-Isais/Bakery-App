@@ -9,6 +9,9 @@ export interface SettlementCategoryApi {
 }
 
 // Charola utilizada dentro del formulario
+// ===============
+// FORMULARIO
+// ===============
 
 export interface SettlementCategoryForm extends SettlementCategoryApi {
   cantidad_devuelta: number | "";
@@ -24,6 +27,21 @@ export interface SettlementFormValues {
   dineroPendiente: number | "";
   notas: number | "";
 }
+// ===============
+// API
+// ===============
+
+export interface FetchCierreRepartidorRequest {
+  id_repartidor: number;
+  fecha: string;
+}
+
+export interface DriverSettlementCategoryPayload {
+  id_categoria: number;
+  cantidad_devuelta: number;
+  cantidad_cambios: number;
+  extra: number;
+}
 
 export interface DriverSettlementPayload {
   id_repartidor: number;
@@ -31,11 +49,5 @@ export interface DriverSettlementPayload {
   total: number;
   dinero_pendiente: number;
   notas: number;
-
-  categorias: {
-    id_categoria: number;
-    cantidad_devuelta: number;
-    cantidad_cambios: number;
-    extra: number;
-  };
+  categorias: DriverSettlementCategoryPayload[];
 }
