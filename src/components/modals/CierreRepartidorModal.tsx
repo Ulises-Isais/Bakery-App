@@ -19,15 +19,20 @@ import {
 } from "../../store/sales/salesCierreRepartidorSlice";
 import { SelectInput } from "../SelectInput";
 import { CierreRepartidorTable } from "./CierreRepartidorTable";
-import type {
-  DriverSettlementPayload,
-  SettlementFormValues,
-} from "../../types/settlement";
+import type { SettlementFormValues } from "../../types/settlement";
 import { SettlementTotalCalculator } from "./SettlementTotalCalculator";
+import {
+  buildDriverSettlementPayload,
+  validateSettlementBusinessRules,
+  type ValidationError,
+} from "../../utils/settlement";
+import { SettlementValidation } from "./SettlementValidation";
 
 interface Props {
   open: boolean;
   onClose: () => void;
+  onSuccess: (message: string) => void;
+  onError: (messahe: string) => void;
 }
 
 const DEFAULT_DATE = "2025-09-12";
@@ -41,7 +46,12 @@ const initialValues: SettlementFormValues = {
   notas: "",
 };
 
-export const CierreRepartidorModal = ({ open, onClose }: Props) => {
+export const CierreRepartidorModal = ({
+  open,
+  onClose,
+  onError,
+  onSuccess,
+}: Props) => {
   const dispatch = useAppDispatch();
 
   const repartidores = useAppSelector((state) => state.repartidores.items);
@@ -50,10 +60,19 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
 
   const [showSettlement, setShowSettlement] = useState(false);
 
-  const handleClose = () => {
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
+    [],
+  );
+
+  const resetSettlement = () => {
     dispatch(clearCierreRepartidor());
 
     setShowSettlement(false);
+  };
+
+  const handleClose = () => {
+    resetSettlement();
+
     onClose();
   };
 
@@ -105,37 +124,33 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
               .required("Selecciona un repartidor"),
             // fecha: Yup.string().required("Selecciona una fecha"),
           })}
-          onSubmit={async (values) => {
-            const payload: DriverSettlementPayload = {
-              id_repartidor: Number(values.repartidor),
-              fecha: values.fecha,
-              total: values.total === "" ? 0 : values.total,
-              dinero_pendiente:
-                values.dineroPendiente === "" ? 0 : values.dineroPendiente,
-              notas: values.notas === "" ? 0 : values.notas,
-
-              categorias: values.charolas.map((cat) => ({
-                id_categoria: cat.id_categoria,
-                cantidad_devuelta:
-                  cat.cantidad_devuelta === "" ? 0 : cat.cantidad_devuelta,
-                cantidad_cambios:
-                  cat.cantidad_cambios === "" ? 0 : cat.cantidad_cambios,
-                extra: cat.extra === "" ? 0 : cat.extra,
-              })),
-            };
+          onSubmit={async (values, { resetForm }) => {
+            const validation = validateSettlementBusinessRules(values.charolas);
+            if (!validation.valid) {
+              onError(validation.errors[0].message);
+              return;
+            }
+            const payload = buildDriverSettlementPayload(values);
 
             const result = await dispatch(saveDriverSettlement(payload));
 
             if (saveDriverSettlement.fulfilled.match(result)) {
-              console.log("Cierre correctamente");
-            } else {
-              console.error(result.payload);
+              resetForm();
+
+              onSuccess("Cierre realizado correctamente.");
+
+              handleClose();
+            }
+
+            if (saveDriverSettlement.rejected.match(result)) {
+              onError("No fue posible realizar el cierre.");
             }
           }}
         >
           {({ values, isSubmitting, setFieldValue }) => (
             <Form>
               <SettlementTotalCalculator />
+              <SettlementValidation setValidationErrors={setValidationErrors} />
               {/* Repartidor */}
               <SelectInput name="repartidor" label="Repartidor" sx={{ mb: 2 }}>
                 <MenuItem value="">Selecciona un repartidor</MenuItem>
@@ -169,7 +184,9 @@ export const CierreRepartidorModal = ({ open, onClose }: Props) => {
                 </Button>
               )}
               {/* Tabla */}
-              {showSettlement && <CierreRepartidorTable />}
+              {showSettlement && (
+                <CierreRepartidorTable validationErrors={validationErrors} />
+              )}
               {showSettlement && (
                 <Box sx={{ mt: 3 }}>
                   <Typography variant="h6" sx={{ mb: 2 }}>

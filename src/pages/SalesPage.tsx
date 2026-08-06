@@ -80,6 +80,13 @@ export const SalesPage = () => {
     return <Typography color="error">Error: {error}</Typography>;
   }
 
+  const handleSuccess = (message: string) => {
+    setSnackbar({ open: true, severity: "success", message });
+  };
+
+  const handleError = (message: string) => {
+    setSnackbar({ open: true, severity: "error", message });
+  };
   // const despachoManana = despacho.filter((d) => d.turno === "mañana");
   // const despachoTarde = despacho.filter((d) => d.turno === "tarde");
 
@@ -300,24 +307,17 @@ export const SalesPage = () => {
           setOpenCharolas(false);
           refreshData();
         }}
-        onSuccess={(message) => {
-          setSnackbar({
-            open: true,
-            severity: "success",
-            message,
-          });
-        }}
-        onError={(message) => {
-          setSnackbar({
-            open: true,
-            severity: "error",
-            message,
-          });
-        }}
+        onSuccess={handleSuccess}
+        onError={handleError}
       />
       <CierreRepartidorModal
         open={openDriverSettlement}
-        onClose={() => setopenDriverSettlement(false)}
+        onClose={() => {
+          setopenDriverSettlement(false);
+          refreshData();
+        }}
+        onSuccess={handleSuccess}
+        onError={handleError}
       />
       <SnackbarAlert
         open={snackbar.open}
