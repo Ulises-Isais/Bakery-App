@@ -1,11 +1,10 @@
-import { TextField } from "@mui/material";
+import { TextField, type TextFieldProps } from "@mui/material";
 import { useField } from "formik";
 
-interface Props {
+interface Props extends Omit<TextFieldProps, "select" | "children"> {
   label: string;
   name: string;
   children: React.ReactNode;
-  [x: string]: any;
 }
 
 export const SelectInput = ({ label, children, ...props }: Props) => {
@@ -17,6 +16,7 @@ export const SelectInput = ({ label, children, ...props }: Props) => {
       fullWidth
       label={label}
       {...field}
+      {...props}
       error={meta.touched && Boolean(meta.error)}
       helperText={meta.touched && meta.error}
     >

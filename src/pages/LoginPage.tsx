@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
-import { TextInput } from "../components";
+import { LoginTextInput } from "../components";
 import appApi from "../api/api";
 
 import "../styles/login.css";
@@ -93,14 +93,14 @@ export const LoginPage = () => {
               >
                 {({}) => (
                   <Form className="form-group">
-                    <TextInput
+                    <LoginTextInput
                       label="Usuario"
                       name="username"
                       type="text"
                       placeholder="Usuario"
                       className="form__input"
                     />
-                    <TextInput
+                    <LoginTextInput
                       label="Contraseña"
                       name="password"
                       type="password"

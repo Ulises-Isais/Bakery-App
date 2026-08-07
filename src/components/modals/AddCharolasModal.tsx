@@ -10,7 +10,6 @@ import { FieldArray, Form, Formik } from "formik";
 import * as Yup from "yup";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { TextInput } from "../TextInput";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { addCharolas } from "../../store/sales/charolasSlice";
 import { SelectInput } from "../SelectInput";
@@ -160,7 +159,7 @@ export const AddCharolasModal = ({
                         </SelectInput>
 
                         {/* Cantidad */}
-                        <TextInput
+                        <TextField
                           name={`productos.${index}.cantidad`}
                           label="Cantidad"
                           type="number"

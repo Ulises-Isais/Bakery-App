@@ -15,6 +15,14 @@ import type { ValidationError } from "../../utils/settlement";
 interface Props {
   validationErrors: ValidationError[];
 }
+
+const centeredNumberInput = {
+  htmlInput: {
+    style: {
+      textAlign: "center" as const,
+    },
+  },
+};
 export const CierreRepartidorTable = ({ validationErrors }: Props) => {
   const { values, setFieldValue } = useFormikContext<SettlementFormValues>();
   const getFieldError = (
@@ -57,10 +65,11 @@ export const CierreRepartidorTable = ({ validationErrors }: Props) => {
                   <TextField
                     size="small"
                     type="number"
-                    fullWidth
+                    sx={{ minWidth: 90 }}
                     value={ch.cantidad_devuelta}
                     error={Boolean(devolucionError)}
                     helperText={devolucionError?.message}
+                    slotProps={centeredNumberInput}
                     onChange={(e) => {
                       const value = e.target.value;
 
@@ -75,8 +84,9 @@ export const CierreRepartidorTable = ({ validationErrors }: Props) => {
                   <TextField
                     size="small"
                     type="number"
-                    fullWidth
+                    sx={{ minWidth: 90 }}
                     value={ch.cantidad_cambios}
+                    slotProps={centeredNumberInput}
                     error={Boolean(cambiosError)}
                     helperText={cambiosError?.message}
                     onChange={(e) => {
@@ -93,8 +103,9 @@ export const CierreRepartidorTable = ({ validationErrors }: Props) => {
                   <TextField
                     size="small"
                     type="number"
-                    fullWidth
+                    sx={{ minWidth: 90 }}
                     value={ch.extra}
+                    slotProps={centeredNumberInput}
                     onChange={(e) => {
                       const value = e.target.value;
 

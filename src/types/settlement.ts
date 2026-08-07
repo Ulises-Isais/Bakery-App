@@ -20,7 +20,7 @@ export interface SettlementCategoryForm extends SettlementCategoryApi {
 }
 
 export interface SettlementFormValues {
-  repartidor: number;
+  repartidor: number | "";
   fecha: string;
   charolas: SettlementCategoryForm[];
   total: number | "";

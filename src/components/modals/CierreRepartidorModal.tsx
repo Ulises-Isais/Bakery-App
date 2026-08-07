@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Dialog,
+  Grid,
   MenuItem,
   TextField,
   Typography,
@@ -27,6 +28,7 @@ import {
   type ValidationError,
 } from "../../utils/settlement";
 import { SettlementValidation } from "./SettlementValidation";
+import { formatMoney } from "../../helpers";
 
 interface Props {
   open: boolean;
@@ -38,7 +40,7 @@ interface Props {
 const DEFAULT_DATE = "2025-09-12";
 
 const initialValues: SettlementFormValues = {
-  repartidor: 0,
+  repartidor: "",
   fecha: DEFAULT_DATE,
   charolas: [],
   total: "",
@@ -63,7 +65,7 @@ export const CierreRepartidorModal = ({
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
     [],
   );
-
+  // Limpia el estado del cierre antes de cerral el modal
   const resetSettlement = () => {
     dispatch(clearCierreRepartidor());
 
@@ -114,7 +116,7 @@ export const CierreRepartidorModal = ({
     >
       <Box p={3}>
         <Typography variant="h6" mb={3}>
-          Cierre de repartidor
+          Cierre de venta del repartidor
         </Typography>
         <Formik<SettlementFormValues>
           initialValues={initialValues}
@@ -127,7 +129,6 @@ export const CierreRepartidorModal = ({
           onSubmit={async (values, { resetForm }) => {
             const validation = validateSettlementBusinessRules(values.charolas);
             if (!validation.valid) {
-              onError(validation.errors[0].message);
               return;
             }
             const payload = buildDriverSettlementPayload(values);
@@ -147,12 +148,18 @@ export const CierreRepartidorModal = ({
             }
           }}
         >
-          {({ values, isSubmitting, setFieldValue }) => (
+          {({
+            values,
+            isSubmitting,
+            setFieldValue,
+            validateForm,
+            setTouched,
+          }) => (
             <Form>
               <SettlementTotalCalculator />
               <SettlementValidation setValidationErrors={setValidationErrors} />
               {/* Repartidor */}
-              <SelectInput name="repartidor" label="Repartidor" sx={{ mb: 2 }}>
+              <SelectInput name="repartidor" label="Repartidor" sx={{ mb: 3 }}>
                 <MenuItem value="">Selecciona un repartidor</MenuItem>
 
                 {repartidores.map((r) => (
@@ -170,7 +177,7 @@ export const CierreRepartidorModal = ({
                 disabled
                 label="Fecha"
                 value={values.fecha}
-                sx={{ mb: 2 }}
+                sx={{ mb: 4 }}
               />
               {/* Buscar */}
               {!showSettlement && (
@@ -178,9 +185,18 @@ export const CierreRepartidorModal = ({
                   type="button"
                   variant="contained"
                   disabled={loading || isSubmitting}
-                  onClick={() => handleSearch(values, setFieldValue)}
+                  onClick={async () => {
+                    const errors = await validateForm();
+                    if (Object.keys(errors).length > 0) {
+                      setTouched({
+                        repartidor: true,
+                      });
+                      return;
+                    }
+                    handleSearch(values, setFieldValue);
+                  }}
                 >
-                  Buscar
+                  Consultar
                 </Button>
               )}
               {/* Tabla */}
@@ -190,43 +206,67 @@ export const CierreRepartidorModal = ({
               {showSettlement && (
                 <Box sx={{ mt: 3 }}>
                   <Typography variant="h6" sx={{ mb: 2 }}>
-                    Información de la venta
+                    Resumen del cierre
                   </Typography>
-                  <Box display="flex" gap={2} sx={{ mb: 2 }}>
-                    <TextField
-                      fullWidth
-                      label="Total Vendido"
-                      value={values.total}
-                      slotProps={{
-                        htmlInput: {
-                          readOnly: true,
-                        },
-                      }}
-                    />
-                    <TextField
-                      fullWidth
-                      label="Dinero pendiente"
-                      type="number"
-                      value={values.dineroPendiente}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setFieldValue(
-                          "dineroPendiente",
-                          value === "" ? "" : Number(value),
-                        );
-                      }}
-                    />
-                  </Box>
-                  <TextField
-                    fullWidth
-                    label="Notas"
-                    type="number"
-                    value={values.notas}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setFieldValue("notas", value === "" ? "" : Number(value));
-                    }}
-                  />
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <TextField
+                        fullWidth
+                        label="Total Vendido"
+                        value={formatMoney(Number(values.total || 0))}
+                        slotProps={{
+                          htmlInput: {
+                            readOnly: true,
+                            style: { textAlign: "center" },
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <TextField
+                        fullWidth
+                        label="Dinero pendiente"
+                        type="number"
+                        value={values.dineroPendiente}
+                        slotProps={{
+                          htmlInput: {
+                            style: {
+                              textAlign: "center",
+                            },
+                          },
+                        }}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setFieldValue(
+                            "dineroPendiente",
+                            value === "" ? "" : Number(value),
+                          );
+                        }}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4 }}>
+                      <TextField
+                        fullWidth
+                        label="Notas"
+                        type="number"
+                        value={values.notas}
+                        slotProps={{
+                          htmlInput: {
+                            style: {
+                              textAlign: "center",
+                            },
+                          },
+                        }}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setFieldValue(
+                            "notas",
+                            value === "" ? "" : Number(value),
+                          );
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
                 </Box>
               )}
               <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
@@ -234,7 +274,13 @@ export const CierreRepartidorModal = ({
                   Cancelar
                 </Button>
                 {showSettlement && (
-                  <Button type="submit" variant="contained">
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={
+                      isSubmitting || loading || validationErrors.length > 0
+                    }
+                  >
                     Guardar cierre
                   </Button>
                 )}

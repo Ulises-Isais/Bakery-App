@@ -31,6 +31,7 @@ export const validateSettlementBusinessRules = (
         field: "cantidad_devuelta",
         message: "Las devoluciones no pueden ser negativas.",
       });
+      continue;
     }
 
     if (cambios < 0) {
@@ -39,34 +40,37 @@ export const validateSettlementBusinessRules = (
         field: "cantidad_cambios",
         message: `${category.categoria}: los cambios no pueden ser negativos.`,
       });
+      continue;
     }
-
+    // Validar devoluciones
     if (devoluciones > enviadas) {
       errors.push({
         id_categoria: category.id_categoria,
         field: "cantidad_devuelta",
         message: `Las devoluciones superan la cantidad enviada.`,
       });
+      continue;
     }
-
+    // Validar cambios
     if (cambios > enviadas) {
       errors.push({
         id_categoria: category.id_categoria,
         field: "cantidad_cambios",
         message: "Los cambios superan la cantidad enviada.",
       });
+      continue;
     }
-
+    // Validar suma
     if (devoluciones + cambios > enviadas) {
       errors.push({
         id_categoria: category.id_categoria,
         field: "cantidad_devuelta",
-        message: "La suma de devoluciones y cambios supera la cantidad enviada",
+        message: "Regresos + cambios exceden la cantidad enviada.",
       });
       errors.push({
         id_categoria: category.id_categoria,
         field: "cantidad_cambios",
-        message: "La suma de devoluciones y cambios supera la cantidad enviada",
+        message: "Regresos + cambios exceden la cantidad enviada.",
       });
     }
   }

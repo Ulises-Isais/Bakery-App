@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 
-import { TextInput } from "../components";
+import { LoginTextInput } from "../components";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { changePassword, resetPasswordState } from "../store/auth/forgotSlice";
 
@@ -71,21 +71,21 @@ export const ForgotPage = () => {
               >
                 {({}) => (
                   <Form className="form-group">
-                    <TextInput
+                    <LoginTextInput
                       label="username"
                       name="username"
                       type="text"
                       className="form__input"
                       placeholder="Usuario"
                     />
-                    <TextInput
+                    <LoginTextInput
                       label="password1"
                       name="password1"
                       type="password"
                       className="form__input"
                       placeholder="Contraseña"
                     />
-                    <TextInput
+                    <LoginTextInput
                       label="password2"
                       name="password2"
                       type="password"
