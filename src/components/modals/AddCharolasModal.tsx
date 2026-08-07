@@ -13,6 +13,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { addCharolas } from "../../store/sales/charolasSlice";
 import { SelectInput } from "../SelectInput";
+import { FormikTextField } from "../FormikTextField";
 
 interface Props {
   open: boolean;
@@ -159,7 +160,7 @@ export const AddCharolasModal = ({
                         </SelectInput>
 
                         {/* Cantidad */}
-                        <TextField
+                        <FormikTextField
                           name={`productos.${index}.cantidad`}
                           label="Cantidad"
                           type="number"
