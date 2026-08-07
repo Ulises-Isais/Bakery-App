@@ -2,15 +2,11 @@ import { ErrorMessage, useField } from "formik";
 import "../styles/login.css";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
   name: string;
-  type?: React.InputHTMLAttributes<HTMLInputElement>["type"];
-  placeholder?: string;
-  className?: string;
 }
 
-export const LoginTextInput = ({ label, ...props }: Props) => {
-  const [field] = useField(props);
+export const LoginTextInput = ({ ...props }: Props) => {
+  const [field] = useField({ name: props.name });
 
   return (
     <div className="row">

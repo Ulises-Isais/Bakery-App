@@ -8,7 +8,7 @@ interface Props extends Omit<TextFieldProps, "select" | "children"> {
 }
 
 export const SelectInput = ({ label, children, ...props }: Props) => {
-  const [field, meta] = useField(props);
+  const [field, meta] = useField({ name: props.name });
 
   return (
     <TextField

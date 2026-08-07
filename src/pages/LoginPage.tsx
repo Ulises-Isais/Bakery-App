@@ -91,17 +91,15 @@ export const LoginPage = () => {
                     .required("Ingresa la contraseña"),
                 })}
               >
-                {({}) => (
+                {() => (
                   <Form className="form-group">
                     <LoginTextInput
-                      label="Usuario"
                       name="username"
                       type="text"
                       placeholder="Usuario"
                       className="form__input"
                     />
                     <LoginTextInput
-                      label="Contraseña"
                       name="password"
                       type="password"
                       placeholder="Contraseña"

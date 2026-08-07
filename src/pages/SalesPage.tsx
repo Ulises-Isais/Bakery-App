@@ -31,7 +31,7 @@ export const SalesPage = () => {
   // Admin agregar charolas
   const [openCharolas, setOpenCharolas] = useState(false);
   // Usuario Corte de despacho
-  const [openCorte, setOpenCorte] = useState(false);
+  const [, setOpenCorte] = useState(false);
   // Corte de repartidores
   const [openDriverSettlement, setopenDriverSettlement] = useState(false);
   const [snackbar, setSnackbar] = useState({

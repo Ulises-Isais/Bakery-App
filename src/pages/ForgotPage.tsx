@@ -69,24 +69,21 @@ export const ForgotPage = () => {
                     .required("Ingresa la contraseña"),
                 })}
               >
-                {({}) => (
+                {() => (
                   <Form className="form-group">
                     <LoginTextInput
-                      label="username"
                       name="username"
                       type="text"
                       className="form__input"
                       placeholder="Usuario"
                     />
                     <LoginTextInput
-                      label="password1"
                       name="password1"
                       type="password"
                       className="form__input"
                       placeholder="Contraseña"
                     />
                     <LoginTextInput
-                      label="password2"
                       name="password2"
                       type="password"
                       className="form__input"

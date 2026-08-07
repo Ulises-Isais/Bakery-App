@@ -8,7 +8,7 @@ import { fetchInventory } from "../store/inventory/inventorySlice";
 export const InventoryPage = () => {
   const dispatch = useAppDispatch();
 
-  const { error, items, loading } = useAppSelector((state) => state.inventory);
+  const { items } = useAppSelector((state) => state.inventory);
 
   useEffect(() => {
     dispatch(fetchInventory());
