@@ -15,10 +15,13 @@ import {
   selectTotalRepartidoresFromTable,
 } from "../store/sales/selectors";
 import { fetchSalesRepartidoresTable } from "../store/sales/salesRepartidoresTableSlice";
-import { AddCharolasModal } from "../components/modals/AddCharolasModal";
+import {
+  AddCharolasModal,
+  CierreRepartidorModal,
+  DispatchClosingModal,
+} from "../components/modals";
 import { fetchCategorias } from "../store/catalogs/categoriesSlice";
 import { fetchRepartidores } from "../store/catalogs/repartidoresSlice";
-import { CierreRepartidorModal } from "../components/modals/CierreRepartidorModal";
 
 export const SalesPage = () => {
   const dispatch = useAppDispatch();
@@ -31,7 +34,7 @@ export const SalesPage = () => {
   // Admin agregar charolas
   const [openCharolas, setOpenCharolas] = useState(false);
   // Usuario Corte de despacho
-  const [, setOpenCorte] = useState(false);
+  const [openCorte, setOpenCorte] = useState(false);
   // Corte de repartidores
   const [openDriverSettlement, setopenDriverSettlement] = useState(false);
   const [snackbar, setSnackbar] = useState({
@@ -150,18 +153,17 @@ export const SalesPage = () => {
           </Grid>
         )}
 
-        {isAdmin ||
-          (isDespacho && (
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Button
-                fullWidth
-                variant="contained"
-                onClick={() => setOpenCorte(true)}
-              >
-                Corte despacho
-              </Button>
-            </Grid>
-          ))}
+        {(isAdmin || isDespacho) && (
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={() => setOpenCorte(true)}
+            >
+              Corte despacho
+            </Button>
+          </Grid>
+        )}
 
         {isAdmin && (
           <Grid size={{ xs: 12, md: 4 }}>
@@ -318,6 +320,10 @@ export const SalesPage = () => {
         }}
         onSuccess={handleSuccess}
         onError={handleError}
+      />
+      <DispatchClosingModal
+        open={openCorte}
+        onClose={() => setOpenCorte(false)}
       />
       <SnackbarAlert
         open={snackbar.open}
