@@ -7,6 +7,7 @@ import {
   selectDispatchClosingError,
   selectDispatchClosingLoading,
 } from "../../store/sales/dispatchClosingSelectors";
+import { DispatchClosingContent } from "./DispatchClosingContent";
 
 interface Props {
   open: boolean;
@@ -32,7 +33,7 @@ export const DispatchClosingModal = ({ open, onClose }: Props) => {
     <Dialog open={open} onClose={onClose}>
       {loading && <Typography variant="h3">Cargando ...</Typography>}
       {error && <Typography variant="h3">Error {error}</Typography>}
-      {closing && <Typography>Preview recibido</Typography>}
+      {closing && <DispatchClosingContent closing={closing} />}
     </Dialog>
   );
 };
