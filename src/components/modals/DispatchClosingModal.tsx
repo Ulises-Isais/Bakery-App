@@ -1,4 +1,11 @@
-import { Dialog, Typography } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+} from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { useEffect } from "react";
 import { fetchDispatchClosingPreview } from "../../store/sales/dispatchClosingSlice";
@@ -30,10 +37,25 @@ export const DispatchClosingModal = ({ open, onClose }: Props) => {
   }, [open, dispatch]);
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      {loading && <Typography variant="h3">Cargando ...</Typography>}
-      {error && <Typography variant="h3">Error {error}</Typography>}
-      {closing && <DispatchClosingContent closing={closing} />}
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+      <DialogTitle>Cierre de Despacho</DialogTitle>
+      <DialogContent dividers>
+        {loading && <Typography variant="h3">Cargando ...</Typography>}
+        {error && <Typography variant="h3">Error {error}</Typography>}
+        {closing && <DispatchClosingContent closing={closing} />}
+      </DialogContent>
+      <DialogActions>
+        <Button
+          variant="contained"
+          disabled={
+            !closing ||
+            closing.pendingMovements.length > 0 ||
+            closing.existingClosing.length > 0
+          }
+        >
+          Cerrar despacho
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };
